@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM — Call Records</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#0f1117; --bg2:#171b26; --bg3:#1e2333; --border:rgba(255,255,255,.07);
+    --text:#e8eaf0; --muted:#7a8099; --accent:#4f8ef7; --accent2:#6ee7b7;
+    --accent3:#f59e42; --accent4:#f87171; --accent5:#a78bfa; --sidebar-w:230px;
+    --font-head:'Syne',sans-serif; --font-body:'DM Sans',sans-serif;
+  }
+  body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:14px; min-height:100vh; display:flex; }
+  .sidebar { width:var(--sidebar-w); min-height:100vh; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; inset:0 auto 0 0; z-index:100; }
+  .sidebar-logo { padding:24px 20px 20px; border-bottom:1px solid var(--border); }
+  .brand { font-family:var(--font-head); font-size:20px; font-weight:700; color:var(--accent); letter-spacing:-.5px; }
+  .role-badge { display:inline-block; margin-top:4px; font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); background:rgba(79,142,247,.1); border:1px solid rgba(79,142,247,.2); padding:2px 8px; border-radius:20px; }
+  .nav-section { padding:16px 12px 8px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1.4px; color:var(--muted); }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 12px; margin:1px 8px; border-radius:8px; color:var(--muted); cursor:pointer; transition:.18s; font-size:13.5px; text-decoration:none; }
+  .nav-item:hover { background:rgba(255,255,255,.05); color:var(--text); }
+  .nav-item.active { background:rgba(79,142,247,.12); color:var(--accent); font-weight:500; }
+  .nav-item .icon { width:18px; height:18px; opacity:.8; flex-shrink:0; }
+  .sidebar-bottom { margin-top:auto; padding:16px; border-top:1px solid var(--border); }
+  .user-pill { display:flex; align-items:center; gap:10px; }
+  .avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent5)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:#fff; }
+  .user-info .name { font-weight:500; font-size:13px; }
+  .user-info .role { font-size:11px; color:var(--muted); }
+  .main { margin-left:var(--sidebar-w); flex:1; min-height:100vh; }
+  .topbar { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 28px; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; }
+  .topbar-title { font-family:var(--font-head); font-size:17px; font-weight:600; }
+  .topbar-right { display:flex; gap:12px; align-items:center; }
+  .btn { border:0; border-radius:8px; padding:8px 13px; font-family:var(--font-body); font-size:12px; font-weight:600; cursor:pointer; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),#2f6fe6); color:#fff; }
+  .btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
+  .content { padding:28px; }
+  .stats-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin-bottom:20px; }
+  .stat-card { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:18px; }
+  .stat-card .label { color:var(--muted); font-size:12px; margin-bottom:8px; }
+  .stat-card .value { font-family:var(--font-head); font-size:28px; font-weight:700; color:var(--accent); }
+  .toolbar { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .search { width:320px; background:var(--bg2); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; outline:0; }
+  .panel { background:var(--bg2); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  th { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.8px; font-weight:600; text-align:left; padding:13px 14px; border-bottom:1px solid var(--border); background:rgba(255,255,255,.02); }
+  td { padding:13px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tr:last-child td { border-bottom:0; }
+  .status-pill { display:inline-flex; padding:4px 9px; border-radius:999px; font-size:11px; font-weight:600; }
+  .connected { background:rgba(110,231,183,.14); color:var(--accent2); }
+  .missed { background:rgba(248,113,113,.14); color:var(--accent4); }
+  .callback { background:rgba(167,139,250,.14); color:var(--accent5); }
+  .neutral { background:rgba(245,158,66,.14); color:var(--accent3); }
+  .empty { padding:34px; text-align:center; color:var(--muted); }
+  @media (max-width:900px) { .stats-grid { grid-template-columns:repeat(2,1fr); } .toolbar { align-items:stretch; flex-direction:column; } .search { width:100%; } }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">SahilCRM</div>
+    <div class="role-badge" id="roleBadge">CRM</div>
+  </div>
+  <div class="nav-section">Workspace</div>
+  <div id="navLinks"></div>
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar" id="userAvatar">U</div>
+      <div class="user-info"><div class="name" id="userName">User</div><div class="role" id="userRole">CRM</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Call Records</div>
+    <div class="topbar-right">
+      <button class="btn btn-outline" onclick="exportTableToCSV('.call-table', 'call-records.csv')">Export</button>
+      <button class="btn btn-primary" onclick="loadCallRecords()">Refresh</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">Total Calls</div><div class="value" id="totalCalls">0</div></div>
+      <div class="stat-card"><div class="label">Connected</div><div class="value" id="connectedCalls">0</div></div>
+      <div class="stat-card"><div class="label">Callbacks</div><div class="value" id="callbackCalls">0</div></div>
+      <div class="stat-card"><div class="label">Avg Duration</div><div class="value" id="avgDuration">0m</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input class="search" id="callSearch" placeholder="Search by lead, counselor, status or remarks..." oninput="filterTable('.call-table', this.value)"/>
+      <select class="search" id="statusFilter" onchange="renderCallRecords()">
+        <option value="">All statuses</option>
+        <option value="CONNECTED">Connected</option>
+        <option value="NOT_REACHABLE">Not reachable</option>
+        <option value="BUSY">Busy</option>
+        <option value="WRONG_NUMBER">Wrong number</option>
+        <option value="CALLBACK_LATER">Callback later</option>
+        <option value="INTERESTED">Interested</option>
+        <option value="NOT_INTERESTED">Not interested</option>
+      </select>
+    </div>
+
+    <div class="panel">
+      <table class="call-table">
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Counselor</th>
+            <th>Call Date</th>
+            <th>Status</th>
+            <th>Duration</th>
+            <th>Next Follow-up</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody><tr><td colspan="7" class="empty">Loading call records...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script src="api.js"></script>
+<script>
+  let callRecords = [];
+
+  function initShell() {
+    if (!checkAuth()) return false;
+    const user = getCurrentUser();
+    const role = localStorage.getItem('role') || user.role || 'CRM';
+    const isCounselor = role === 'COUNSELOR';
+    const initials = (user.name || user.email || 'User').split(' ').map(part => part[0]).join('').substring(0, 2).toUpperCase();
+    document.getElementById('roleBadge').textContent = role;
+    document.getElementById('userAvatar').textContent = initials || 'U';
+    document.getElementById('userName').textContent = user.name || user.email || 'User';
+    document.getElementById('userRole').textContent = role;
+    document.getElementById('navLinks').innerHTML = isCounselor ? counselorNav() : adminNav();
+    return true;
+  }
+
+  function adminNav() {
+    return `
+      <a href="admin-dashboard.html" class="nav-item">Dashboard</a>
+      <a href="manage-users.html" class="nav-item">Manage Users</a>
+      <a href="manage-lists.html" class="nav-item">Manage Lists</a>
+      <a href="manage-leads.html" class="nav-item">Manage Leads</a>
+      <a href="courses.html" class="nav-item">Courses</a>
+      <div class="nav-section">Analytics</div>
+      <a href="reports.html" class="nav-item">Reports</a>
+      <a href="follow-ups.html" class="nav-item">Follow-ups</a>
+      <a href="call-records.html" class="nav-item active">Call Records</a>
+  <a href="admissions.html" class="nav-item">
+    Admissions
+  </a>
+      <div class="nav-section">System</div>
+      <a href="settings.html" class="nav-item">Settings</a>`;
+  }
+
+  function counselorNav() {
+    return `
+      <a href="counselor-dashboard.html" class="nav-item">Dashboard</a>
+      <a href="counselor-followups.html" class="nav-item">Follow-ups</a>
+      <a href="counselor-leads.html" class="nav-item">My Leads</a>
+      <a href="call-records.html" class="nav-item active">Call Records</a>
+  <a href="admissions.html" class="nav-item">
+    Admissions
+  </a>
+      <a href="counselor-reports.html" class="nav-item">Reports</a>
+      <a href="settings.html" class="nav-item">Settings</a>`;
+  }
+
+  async function loadCallRecords() {
+    try {
+      const user = getCurrentUser();
+      const role = localStorage.getItem('role') || user.role;
+      const endpoint = role === 'COUNSELOR' ? '/api/callrecords/counselor/' + user.id : '/api/callrecords';
+      callRecords = await apiGet(endpoint).catch(() => []);
+      renderCallRecords();
+    } catch (e) {
+      showToast('Failed to load call records: ' + e.message, 'error');
+    }
+  }
+
+  function renderCallRecords() {
+    const status = document.getElementById('statusFilter').value;
+    const rows = status ? callRecords.filter(record => record.callStatus === status) : callRecords;
+    const connected = callRecords.filter(record => ['CONNECTED', 'INTERESTED'].includes(record.callStatus)).length;
+    const callbacks = callRecords.filter(record => record.callStatus === 'CALLBACK_LATER' || record.nextFollowUpDate).length;
+    const durations = callRecords.map(record => Number(record.durationMinutes) || 0).filter(Boolean);
+    const avg = durations.length ? Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length) : 0;
+
+    document.getElementById('totalCalls').textContent = callRecords.length;
+    document.getElementById('connectedCalls').textContent = connected;
+    document.getElementById('callbackCalls').textContent = callbacks;
+    document.getElementById('avgDuration').textContent = avg + 'm';
+
+    const tbody = document.querySelector('.call-table tbody');
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty">No call records found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(record => {
+      const lead = record.lead || {};
+      const counselor = record.counselor || {};
+      return `<tr>
+        <td><strong>${lead.firstName || ''} ${lead.lastName || ''}</strong><br><span style="color:var(--muted);font-size:11px;">${lead.phone || ''}</span></td>
+        <td>${counselor.name || 'Unassigned'}</td>
+        <td>${formatDateTime(record.callDate)}</td>
+        <td><span class="status-pill ${statusClass(record.callStatus)}">${statusLabel(record.callStatus)}</span></td>
+        <td>${record.durationMinutes ? record.durationMinutes + ' min' : '-'}</td>
+        <td>${record.nextFollowUpDate ? formatDateTime(record.nextFollowUpDate) : '-'}</td>
+        <td>${record.remarks || '-'}</td>
+      </tr>`;
+    }).join('');
+    filterTable('.call-table', document.getElementById('callSearch').value);
+  }
+
+  function statusLabel(status) {
+    return {
+      CONNECTED: 'Connected', NOT_REACHABLE: 'Not reachable', BUSY: 'Busy',
+      WRONG_NUMBER: 'Wrong number', CALLBACK_LATER: 'Callback later',
+      INTERESTED: 'Interested', NOT_INTERESTED: 'Not interested'
+    }[status] || status || '-';
+  }
+
+  function statusClass(status) {
+    if (['CONNECTED', 'INTERESTED'].includes(status)) return 'connected';
+    if (['NOT_REACHABLE', 'WRONG_NUMBER', 'NOT_INTERESTED'].includes(status)) return 'missed';
+    if (status === 'CALLBACK_LATER') return 'callback';
+    return 'neutral';
+  }
+
+  function formatDateTime(value) {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '-';
+    return date.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  if (initShell()) loadCallRecords();
+</script>
+<script src="frontend-qa.js"></script>
+</body>
+</html>

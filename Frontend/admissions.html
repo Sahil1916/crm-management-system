@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM — Admissions</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0f1117;--bg2:#171b26;--bg3:#1e2333;--border:rgba(255,255,255,.07);--text:#e8eaf0;--muted:#7a8099;--accent:#4f8ef7;--accent2:#6ee7b7;--accent3:#f59e42;--accent4:#f87171;--accent5:#a78bfa;--sidebar-w:230px;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;display:flex}
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:100}
+  .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}.brand{font-family:var(--font-head);font-size:20px;font-weight:700;color:var(--accent)}.role-badge{display:inline-block;margin-top:4px;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);padding:2px 8px;border-radius:20px}
+  .nav-section{padding:16px 12px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted)}.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:1px 8px;border-radius:8px;color:var(--muted);text-decoration:none}.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}.nav-item.active{background:rgba(79,142,247,.12);color:var(--accent);font-weight:500}
+  .sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border)}.user-pill{display:flex;align-items:center;gap:10px}.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent5));display:flex;align-items:center;justify-content:center;font-weight:600}.user-info .name{font-weight:500;font-size:13px}.user-info .role{font-size:11px;color:var(--muted)}
+  .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}.topbar{height:60px;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0}.topbar-title{font-family:var(--font-head);font-size:17px;font-weight:600}.topbar-right{display:flex;gap:12px}.btn{border:0;border-radius:8px;padding:8px 13px;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer}.btn-primary{background:linear-gradient(135deg,var(--accent),#2f6fe6);color:#fff}.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}.btn-danger{background:rgba(248,113,113,.14);color:var(--accent4)}
+  .content{padding:28px}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px}.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px}.label{color:var(--muted);font-size:12px;margin-bottom:8px}.value{font-family:var(--font-head);font-size:28px;font-weight:700;color:var(--accent)}
+  .toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:16px}.search,input,select,textarea{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 12px;font-family:var(--font-body);outline:0}.search{width:320px}.panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}table{width:100%;border-collapse:collapse}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px;text-align:left;padding:13px 14px;border-bottom:1px solid var(--border)}td{padding:13px 14px;border-bottom:1px solid var(--border)}tr:last-child td{border-bottom:0}.pill{display:inline-flex;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:600}.paid{background:rgba(110,231,183,.14);color:var(--accent2)}.partial{background:rgba(245,158,66,.14);color:var(--accent3)}.pending{background:rgba(248,113,113,.14);color:var(--accent4)}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;z-index:500}.modal-overlay.show{display:flex}.modal{width:560px;max-width:calc(100vw - 32px);background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px}.modal-title{font-family:var(--font-head);font-size:18px;margin-bottom:16px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.form-row.full{grid-template-columns:1fr}.form-group label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}.empty{text-align:center;color:var(--muted);padding:32px}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="brand">SahilCRM</div><div class="role-badge" id="roleBadge">CRM</div></div>
+  <div class="nav-section">Workspace</div><div id="navLinks"></div>
+  <div class="sidebar-bottom"><div class="user-pill"><div class="avatar" id="userAvatar">U</div><div class="user-info"><div class="name" id="userName">User</div><div class="role" id="userRole">CRM</div></div></div></div>
+</aside>
+<main class="main">
+  <div class="topbar"><div class="topbar-title">Admissions</div><div class="topbar-right"><button class="btn btn-outline" onclick="exportTableToCSV('.admission-table','admissions.csv')">Export</button><button class="btn btn-primary" onclick="openAdmissionModal()">+ Convert Lead</button></div></div>
+  <div class="content">
+    <div class="stats-grid"><div class="stat-card"><div class="label">Admissions</div><div class="value" id="admissionCount">0</div></div><div class="stat-card"><div class="label">Fees Collected</div><div class="value" id="feesCollected">₹0</div></div><div class="stat-card"><div class="label">Pending Fees</div><div class="value" id="feesPending">₹0</div></div><div class="stat-card"><div class="label">Paid Records</div><div class="value" id="paidCount">0</div></div></div>
+    <div class="toolbar"><input class="search" placeholder="Search admissions..." oninput="filterTable('.admission-table', this.value)"/><button class="btn btn-outline" onclick="loadAdmissions()">Refresh</button></div>
+    <div class="panel"><table class="admission-table"><thead><tr><th>Student</th><th>Course</th><th>Counselor</th><th>Total Fees</th><th>Paid</th><th>Status</th><th>Admission Date</th></tr></thead><tbody><tr><td colspan="7" class="empty">Loading admissions...</td></tr></tbody></table></div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="admissionModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Convert Enquiry to Admission</div>
+    <div class="form-row full"><div class="form-group"><label>Lead</label><select id="leadSelect"></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Course</label><select id="courseSelect"></select></div><div class="form-group"><label>Admission Date</label><input id="admissionDate" type="date"/></div></div>
+    <div class="form-row"><div class="form-group"><label>Total Fees</label><input id="totalFees" type="number" placeholder="75000"/></div><div class="form-group"><label>Fees Paid</label><input id="feesPaid" type="number" placeholder="25000"/></div></div>
+    <div class="form-row"><div class="form-group"><label>Payment Status</label><select id="paymentStatus"><option value="PENDING">Pending</option><option value="PARTIAL">Partial</option><option value="PAID">Paid</option></select></div><div class="form-group"><label>Remarks</label><input id="admissionRemarks" placeholder="Payment type / installment notes"/></div></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="document.getElementById('admissionModal').classList.remove('show')">Cancel</button><button class="btn btn-primary" onclick="saveAdmission()">Save Admission</button></div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+let admissions = [], leads = [], courses = [];
+function initAdmissionsShell(){
+  if(!checkAuth()) return false;
+  const user = getCurrentUser(), role = localStorage.getItem('role') || user.role || 'CRM';
+  const initials = (user.name || user.email || 'User').split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('roleBadge').textContent = role;
+  document.getElementById('userAvatar').textContent = initials || 'U';
+  document.getElementById('userName').textContent = user.name || user.email || 'User';
+  document.getElementById('userRole').textContent = role;
+  document.getElementById('navLinks').innerHTML = role === 'COUNSELOR' ? counselorNav() : adminNav();
+  return true;
+}
+function adminNav(){return `<a href="admin-dashboard.html" class="nav-item">Dashboard</a><a href="manage-users.html" class="nav-item">Manage Users</a><a href="manage-lists.html" class="nav-item">Manage Lists</a><a href="manage-leads.html" class="nav-item">Manage Leads</a><a href="courses.html" class="nav-item">Courses</a><div class="nav-section">Analytics</div><a href="reports.html" class="nav-item">Reports</a><a href="follow-ups.html" class="nav-item">Follow-ups</a><a href="call-records.html" class="nav-item">Call Records</a><a href="admissions.html" class="nav-item active">Admissions</a><div class="nav-section">System</div><a href="settings.html" class="nav-item">Settings</a>`}
+function counselorNav(){return `<a href="counselor-dashboard.html" class="nav-item">Dashboard</a><a href="counselor-followups.html" class="nav-item">Follow-ups</a><a href="counselor-leads.html" class="nav-item">My Leads</a><a href="call-records.html" class="nav-item">Call Records</a><a href="admissions.html" class="nav-item active">Admissions</a><a href="counselor-reports.html" class="nav-item">Reports</a><a href="settings.html" class="nav-item">Settings</a>`}
+async function loadAdmissions(){
+  const user = getCurrentUser(), role = localStorage.getItem('role') || user.role;
+  admissions = await apiGet('/api/admissions').catch(()=>[]);
+  leads = role === 'COUNSELOR' ? await apiGet('/api/leads/counselor/' + user.id).catch(()=>[]) : await apiGet('/api/leads').catch(()=>[]);
+  courses = await apiGet('/api/courses').catch(()=>[]);
+  renderAdmissions();
+}
+function renderAdmissions(){
+  const totalPaid = admissions.reduce((s,a)=>s+(Number(a.feesPaid)||0),0), totalFees = admissions.reduce((s,a)=>s+(Number(a.totalFees)||0),0);
+  document.getElementById('admissionCount').textContent = admissions.length;
+  document.getElementById('feesCollected').textContent = '₹' + totalPaid.toLocaleString('en-IN');
+  document.getElementById('feesPending').textContent = '₹' + Math.max(totalFees-totalPaid,0).toLocaleString('en-IN');
+  document.getElementById('paidCount').textContent = admissions.filter(a=>a.paymentStatus==='PAID').length;
+  const tbody = document.querySelector('.admission-table tbody');
+  if(!admissions.length){tbody.innerHTML='<tr><td colspan="7" class="empty">No admissions yet. Convert an admitted lead.</td></tr>';return}
+  tbody.innerHTML = admissions.map(a=>`<tr><td><strong>${a.lead?.firstName||''} ${a.lead?.lastName||''}</strong><br><span style="color:var(--muted);font-size:11px">${a.lead?.email||''}</span></td><td>${a.course?.code||a.lead?.course||'-'}</td><td>${a.counselor?.name||'Unassigned'}</td><td>₹${Number(a.totalFees||0).toLocaleString('en-IN')}</td><td>₹${Number(a.feesPaid||0).toLocaleString('en-IN')}</td><td><span class="pill ${String(a.paymentStatus||'PENDING').toLowerCase()}">${a.paymentStatus||'PENDING'}</span></td><td>${fmtDate(a.admissionDate)}</td></tr>`).join('');
+}
+function openAdmissionModal(){
+  document.getElementById('admissionDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('leadSelect').innerHTML = leads.map(l=>`<option value="${l.id}">${l.firstName} ${l.lastName} — ${l.course}</option>`).join('');
+  document.getElementById('courseSelect').innerHTML = courses.map(c=>`<option value="${c.id}" data-fees="${c.fees||0}">${c.code} — ${c.name}</option>`).join('');
+  document.getElementById('admissionModal').classList.add('show');
+}
+async function saveAdmission(){
+  const leadId = document.getElementById('leadSelect').value, courseId = document.getElementById('courseSelect').value, user = getCurrentUser();
+  if(!leadId || !courseId) return showToast('Select lead and course.', 'error');
+  const admission = {lead:{id:leadId}, course:{id:courseId}, counselor:{id:user.id}, totalFees:Number(document.getElementById('totalFees').value)||0, feesPaid:Number(document.getElementById('feesPaid').value)||0, paymentStatus:document.getElementById('paymentStatus').value, admissionDate:document.getElementById('admissionDate').value + 'T00:00:00', remarks:document.getElementById('admissionRemarks').value.trim()};
+  await apiPost('/api/admissions', admission);
+  const lead = leads.find(l=>String(l.id)===String(leadId)); if(lead){lead.stage='ADMITTED'; await apiPut('/api/leads/'+leadId, lead).catch(()=>{});}
+  document.getElementById('admissionModal').classList.remove('show'); showToast('Admission recorded.', 'success'); loadAdmissions();
+}
+if(initAdmissionsShell()) loadAdmissions();
+</script>
+<script src="frontend-qa.js"></script>
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM — Follow-ups</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #4f8ef7;
+    --accent2: #6ee7b7;
+    --accent3: #f59e42;
+    --accent4: #f87171;
+    --accent5: #a78bfa;
+    --sidebar-w: 230px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .brand {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .role-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .nav-section {
+    padding: 16px 12px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 13.5px;
+    font-weight: 400;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); font-weight: 500; }
+
+  .nav-item .icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent5));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-info .name { font-weight: 500; font-size: 13px; }
+  .user-info .role { font-size: 11px; color: var(--muted); }
+
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #3d7de8; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color 0.18s;
+    cursor: default;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .stat-card:hover { border-color: var(--border2); }
+
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .value {
+    font-family: var(--font-head);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stat-card.today .value { color: var(--accent); }
+  .stat-card.overdue .value { color: var(--accent4); }
+  .stat-card.week .value { color: var(--accent2); }
+  .stat-card.completed .value { color: var(--accent5); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .followup-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .followup-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .followup-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .followup-table tr:last-child td { border-bottom: none; }
+  .followup-table tbody tr { transition: background 0.12s; }
+  .followup-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+  .user-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-cell .av {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-cell .uname { font-weight: 500; font-size: 13px; }
+  .user-cell .uphone { font-size: 11px; color: var(--muted); }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .pill-pending { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .pill-overdue { background: rgba(248,113,113,0.15); color: var(--accent4); }
+  .pill-done { background: rgba(110,231,183,0.15); color: var(--accent2); }
+
+  .type-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .type-call { background: rgba(79,142,247,0.12); color: var(--accent); }
+  .type-email { background: rgba(167,139,250,0.12); color: var(--accent5); }
+  .type-visit { background: rgba(245,158,66,0.12); color: var(--accent3); }
+
+  .search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .search-row input {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    width: 240px;
+    font-family: var(--font-body);
+  }
+
+  .search-row input:focus { border-color: var(--accent); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .stat-card:nth-child(2) { animation-delay: 0.10s; }
+  .stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">SahilCRM</div>
+    <span class="role-badge">Admin</span>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <a href="admin-dashboard.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a href="manage-users.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Manage Users
+    <span class="badge">5</span>
+  </a>
+  <a href="manage-lists.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+    Manage Lists
+  </a>
+  <a href="manage-leads.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    Manage Leads
+    <span class="badge">248</span>
+  </a>
+  <a href="courses.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    Courses
+  </a>
+
+  <div class="nav-section">Analytics</div>
+  <a href="reports.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Reports
+  </a>
+  <a href="follow-ups.html" class="nav-item active">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Follow-ups
+  </a>
+  <a href="call-records.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 012.08 4.18 2 2 0 014.06 2h3a2 2 0 012 1.72c.12.9.33 1.77.62 2.61a2 2 0 01-.45 2.11L8 9.67a16 16 0 006.33 6.33l1.23-1.23a2 2 0 012.11-.45c.84.29 1.71.5 2.61.62A2 2 0 0122 16.92z"/></svg>
+    Call Records
+  </a>
+  <a href="admissions.html" class="nav-item">
+    Admissions
+  </a>
+
+  <div class="nav-section">System</div>
+  <a href="settings.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">SA</div>
+      <div class="user-info">
+        <div class="name">Super Admin</div>
+        <div class="role">admin@SahilCRM.in</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Follow-ups</div>
+    <div class="topbar-right">
+      <button class="btn btn-primary">+ Schedule Follow-up</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card today">
+        <div class="label">Today</div>
+        <div class="value">12</div>
+        <div class="sub">Scheduled for today</div>
+      </div>
+      <div class="stat-card overdue">
+        <div class="label">Overdue</div>
+        <div class="value">5</div>
+        <div class="sub">Need immediate action</div>
+      </div>
+      <div class="stat-card week">
+        <div class="label">This Week</div>
+        <div class="value">38</div>
+        <div class="sub">Upcoming 7 days</div>
+      </div>
+      <div class="stat-card completed">
+        <div class="label">Completed</div>
+        <div class="value">142</div>
+        <div class="sub">This month</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-header">
+        <div class="section-title">All Follow-ups</div>
+        <div class="search-row">
+          <input type="text" placeholder="Search follow-ups..."/>
+          <button class="btn btn-outline">Filter</button>
+        </div>
+      </div>
+      <table class="followup-table">
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Type</th>
+            <th>Scheduled</th>
+            <th>Status</th>
+            <th>Assigned To</th>
+            <th>Notes</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="av" style="background: linear-gradient(135deg,#4f8ef7,#a78bfa)">AR</div>
+                <div><div class="uname">Arjun Rao</div><div class="uphone">+91 98765 43210</div></div>
+              </div>
+            </td>
+            <td><span class="type-tag type-call">Call</span></td>
+            <td>Today, 10:30 AM</td>
+            <td><span class="status-pill pill-pending">Pending</span></td>
+            <td>Priya Sharma</td>
+            <td>Fee discussion</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Mark Done</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="av" style="background: linear-gradient(135deg,#6ee7b7,#4f8ef7)">NJ</div>
+                <div><div class="uname">Neha Joshi</div><div class="uphone">+91 87654 32109</div></div>
+              </div>
+            </td>
+            <td><span class="type-tag type-call">Call</span></td>
+            <td>Today, 2:00 PM</td>
+            <td><span class="status-pill pill-pending">Pending</span></td>
+            <td>Rahul Kumar</td>
+            <td>Stage 2.5 follow-up</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Mark Done</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="av" style="background: linear-gradient(135deg,#f59e42,#f87171)">RP</div>
+                <div><div class="uname">Riya Patel</div><div class="uphone">+91 76543 21098</div></div>
+              </div>
+            </td>
+            <td><span class="type-tag type-email">Email</span></td>
+            <td>Yesterday, 11:00 AM</td>
+            <td><span class="status-pill pill-overdue">Overdue</span></td>
+            <td>Ankit Mehta</td>
+            <td>Brochure + fee structure</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Mark Done</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="av" style="background: linear-gradient(135deg,#a78bfa,#f87171)">VS</div>
+                <div><div class="uname">Vikram Singh</div><div class="uphone">+91 65432 10987</div></div>
+              </div>
+            </td>
+            <td><span class="type-tag type-visit">Visit</span></td>
+            <td>Tomorrow, 3:00 PM</td>
+            <td><span class="status-pill pill-pending">Pending</span></td>
+            <td>Sneha Desai</td>
+            <td>Campus tour scheduled</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Mark Done</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="av" style="background: linear-gradient(135deg,#f87171,#f59e42)">SS</div>
+                <div><div class="uname">Sana Shaikh</div><div class="uphone">+91 54321 09876</div></div>
+              </div>
+            </td>
+            <td><span class="type-tag type-call">Call</span></td>
+            <td>Apr 28, 10:00 AM</td>
+            <td><span class="status-pill pill-pending">Pending</span></td>
+            <td>Rahul Kumar</td>
+            <td>First contact attempt</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Mark Done</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="av" style="background: linear-gradient(135deg,#4f8ef7,#6ee7b7)">KM</div>
+                <div><div class="uname">Karan Malhotra</div><div class="uphone">+91 99887 76655</div></div>
+              </div>
+            </td>
+            <td><span class="type-tag type-email">Email</span></td>
+            <td>Apr 24, 4:00 PM</td>
+            <td><span class="status-pill pill-done">Completed</span></td>
+            <td>Priya Sharma</td>
+            <td>Application link sent</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="frontend-qa.js"></script>
+</body>
+</html>
+

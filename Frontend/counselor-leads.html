@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM — My Leads</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #4f8ef7;
+    --accent2: #6ee7b7;
+    --accent3: #f59e42;
+    --accent4: #f87171;
+    --accent5: #a78bfa;
+    --sidebar-w: 230px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .brand {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .role-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    background: rgba(110,231,183,0.1);
+    border: 1px solid rgba(110,231,183,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .nav-section {
+    padding: 16px 12px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 13.5px;
+    font-weight: 400;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); font-weight: 500; }
+
+  .nav-item .icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-info .name { font-weight: 500; font-size: 13px; }
+  .user-info .role { font-size: 11px; color: var(--muted); }
+
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #3d7de8; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .btn-success {
+    background: rgba(110,231,183,0.15);
+    color: var(--accent2);
+    border: 1px solid rgba(110,231,183,0.3);
+  }
+
+  .btn-success:hover { background: rgba(110,231,183,0.25); }
+
+  .btn-danger {
+    background: rgba(248,113,113,0.1);
+    color: var(--accent4);
+    border: 1px solid rgba(248,113,113,0.25);
+  }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color 0.18s;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .value {
+    font-family: var(--font-head);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stat-card.open .value { color: var(--accent); }
+  .stat-card.cnr .value { color: var(--accent3); }
+  .stat-card.converted .value { color: var(--accent2); }
+  .stat-card.followup .value { color: var(--accent5); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .lead-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .lead-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lead-table td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .lead-table tr:last-child td { border-bottom: none; }
+  .lead-table tbody tr { transition: background 0.12s; }
+  .lead-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+  .stage-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .pill-open { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .pill-cnr { background: rgba(245,158,66,0.15); color: var(--accent3); }
+  .pill-callback { background: rgba(167,139,250,0.15); color: var(--accent5); }
+  .pill-s2 { background: rgba(110,231,183,0.15); color: var(--accent2); }
+  .pill-done { background: rgba(251,146,60,0.15); color: #fb923c; }
+
+  .source-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .src-meta { background: rgba(79,142,247,0.12); color: var(--accent); }
+  .src-google { background: rgba(110,231,183,0.12); color: var(--accent2); }
+  .src-insta { background: rgba(167,139,250,0.12); color: var(--accent5); }
+  .src-walkin { background: rgba(245,158,66,0.12); color: var(--accent3); }
+
+  .search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .search-row input {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    width: 240px;
+    font-family: var(--font-body);
+  }
+
+  .action-group {
+    display: flex;
+    gap: 6px;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 26px 28px;
+    width: 460px;
+    max-width: 95vw;
+    animation: fadeUp 0.2s ease;
+  }
+
+  .modal-title {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-row.full { grid-template-columns: 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-group label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-group input, .form-group select, .form-group textarea {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--bg3); }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">SahilCRM</div>
+    <span class="role-badge">Counselor</span>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <a href="counselor-dashboard.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a href="counselor-followups.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    My Follow-ups
+    <span class="badge">8</span>
+  </a>
+  <a href="counselor-leads.html" class="nav-item active">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    My Leads
+    <span class="badge">62</span>
+  </a>
+  <a href="call-records.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 012.08 4.18 2 2 0 014.06 2h3a2 2 0 012 1.72c.12.9.33 1.77.62 2.61a2 2 0 01-.45 2.11L8 9.67a16 16 0 006.33 6.33l1.23-1.23a2 2 0 012.11-.45c.84.29 1.71.5 2.61.62A2 2 0 0122 16.92z"/></svg>
+    Call Records
+  </a>
+  <a href="admissions.html" class="nav-item">
+    Admissions
+  </a>
+
+  <div class="nav-section">Analytics</div>
+  <a href="counselor-reports.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    My Performance
+  </a>
+
+  <div class="nav-section">System</div>
+  <a href="settings.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">RK</div>
+      <div class="user-info">
+        <div class="name">Rahul Kumar</div>
+        <div class="role">rahul@SahilCRM.in</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">My Assigned Leads</div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="document.getElementById('addLeadModal').classList.add('show')">+ Add Lead</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card open">
+        <div class="label">Open</div>
+        <div class="value">18</div>
+        <div class="sub">Needs first call</div>
+      </div>
+      <div class="stat-card cnr">
+        <div class="label">CNR</div>
+        <div class="value">6</div>
+        <div class="sub">Retry today</div>
+      </div>
+      <div class="stat-card followup">
+        <div class="label">Follow-up</div>
+        <div class="value">24</div>
+        <div class="sub">Scheduled callbacks</div>
+      </div>
+      <div class="stat-card converted">
+        <div class="label">Converted</div>
+        <div class="value">14</div>
+        <div class="sub">Admissions this month</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-header">
+        <div class="section-title">All My Leads</div>
+        <div class="search-row">
+          <input type="text" placeholder="Search my leads..."/>
+          <button class="btn btn-outline">Filter</button>
+        </div>
+      </div>
+      <table class="lead-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Course</th>
+            <th>Source</th>
+            <th>Stage</th>
+            <th>Last Contact</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LEAD MODAL -->
+<div class="modal-overlay" id="addLeadModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Add New Lead</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" placeholder="First name"/>
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" placeholder="Last name"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" placeholder="+91 98765 43210"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="email@example.com"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Course</label>
+        <select><option>MBA</option><option>MCA</option><option>BBA</option><option>BCA</option></select>
+      </div>
+      <div class="form-group">
+        <label>Source</label>
+        <select><option>Meta</option><option>Google</option><option>Instagram</option><option>Walk-in</option><option>Inbound</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>College</label>
+        <input type="text" placeholder="College name"/>
+      </div>
+      <div class="form-group">
+        <label>University</label>
+        <input type="text" placeholder="University name"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Qualification</label>
+        <select><option>High School</option><option>Diploma</option><option>Bachelor's</option><option>Master's</option><option>Other</option></select>
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" placeholder="City"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('addLeadModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- CALL LOG MODAL -->
+<div class="modal-overlay" id="callModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Log Call — Neha Joshi</div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Call Status</label>
+        <select>
+          <option>Connected</option>
+          <option>Not Reachable</option>
+          <option>Busy</option>
+          <option>Wrong Number</option>
+          <option>Call Back Later</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Call Duration (minutes)</label>
+        <input type="number" placeholder="e.g. 5"/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Remarks / Notes</label>
+        <textarea placeholder="What did you discuss?"></textarea>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Next Follow-up Date</label>
+        <input type="date"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('callModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCallLog()">Save Call Log</button>
+    </div>
+  </div>
+</div>
+
+<!-- UPDATE STATUS MODAL -->
+<div class="modal-overlay" id="statusModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Update Lead Status</div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Move To Stage</label>
+        <select>
+          <option>Open</option>
+          <option>CNR</option>
+          <option>Call Back</option>
+          <option>Stage 2</option>
+          <option>Stage 2.5</option>
+          <option>Admitted</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Comment</label>
+        <textarea placeholder="Reason for status change..."></textarea>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Follow-up Date</label>
+        <input type="date"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('statusModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-success" onclick="updateLeadStatus()">Update Status</button>
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+  function getCounselorId() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user.id || 3;
+  }
+
+  async function loadMyLeads() {
+    try {
+      const counselorId = getCounselorId();
+      const leads = await apiGet('/api/leads/counselor/' + counselorId).catch(() => []);
+
+      const counts = { OPEN:0, CNR:0, CALLBACK:0, STAGE2:0, STAGE2_5:0, ADMITTED:0 };
+      leads.forEach(l => { if (counts[l.stage] !== undefined) counts[l.stage]++; });
+
+      const statCards = document.querySelectorAll('.stats-grid .stat-card .value');
+      if (statCards[0]) statCards[0].textContent = counts.OPEN;
+      if (statCards[1]) statCards[1].textContent = counts.CNR;
+      if (statCards[2]) statCards[2].textContent = counts.CALLBACK + counts.STAGE2 + counts.STAGE2_5;
+      if (statCards[3]) statCards[3].textContent = counts.ADMITTED;
+
+      const tbody = document.querySelector('.lead-table tbody');
+      if (tbody && leads.length > 0) {
+        tbody.innerHTML = leads.map(l => {
+          const stageClass = { OPEN:'pill-open', CNR:'pill-cnr', CALLBACK:'pill-callback', STAGE2:'pill-s2', STAGE2_5:'pill-s2', ADMITTED:'pill-done' }[l.stage] || 'pill-open';
+          const stageLabel = { OPEN:'Open', CNR:'CNR', CALLBACK:'Call Back', STAGE2:'Stage 2', STAGE2_5:'Stage 2.5', ADMITTED:'Admitted' }[l.stage] || l.stage;
+          const srcClass = { META:'src-meta', GOOGLE:'src-google', INSTAGRAM:'src-insta', WALKIN:'src-walkin', INBOUND:'src-walkin' }[l.source] || 'src-meta';
+          const srcLabel = { META:'Meta', GOOGLE:'Google', INSTAGRAM:'Instagram', WALKIN:'Walk-in', INBOUND:'Inbound' }[l.source] || l.source;
+          return `<tr>
+            <td><strong>${l.firstName} ${l.lastName}</strong><br><span style="color:var(--muted); font-size:11px;">${l.email}</span></td>
+            <td>${l.countryCode || '+91'} ${l.phone}</td>
+            <td>${l.course}</td>
+            <td><span class="source-tag ${srcClass}">${srcLabel}</span></td>
+            <td><span class="stage-pill ${stageClass}">${stageLabel}</span></td>
+            <td>${new Date(l.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}</td>
+            <td>
+              <div class="action-group">
+                <button class="btn btn-outline" style="font-size:10px; padding:4px 8px;" onclick="openCallModal(${l.id}, '${l.firstName} ${l.lastName}')">Call</button>
+                <button class="btn btn-success" style="font-size:10px; padding:4px 8px;" onclick="openStatusModal(${l.id})">Update</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+    } catch (e) {
+      console.log('My leads fetch failed:', e.message);
+    }
+  }
+
+  // Save new lead from modal
+  async function saveNewLead() {
+    const modal = document.getElementById('addLeadModal');
+    const firstName = modal.querySelector('input[placeholder*="First"]').value.trim();
+    const lastName = modal.querySelector('input[placeholder*="Last"]').value.trim();
+    const phone = modal.querySelector('input[placeholder*="+91"]').value.trim();
+    const email = modal.querySelector('input[type="email"]').value.trim();
+    const course = modal.querySelectorAll('select')[0].value;
+    const source = enumSource(modal.querySelectorAll('select')[1].value);
+    const college = modal.querySelectorAll('input[placeholder*="College"]')[0].value.trim();
+    const university = modal.querySelectorAll('input[placeholder*="University"]')[0].value.trim();
+    const qualification = modal.querySelectorAll('select')[2].value;
+    const location = modal.querySelector('input[placeholder*="City"]').value.trim();
+
+    if (!firstName || !lastName || !phone || !email || !course) {
+      showToast('Please fill all required fields', 'error');
+      return;
+    }
+
+    try {
+      await apiPost('/api/leads', {
+        firstName, lastName, phone, email, course,
+        source: source,
+        college, university, qualification, location,
+        assignedTo: { id: getCounselorId() }
+      });
+      showToast('Lead added successfully!', 'success');
+      modal.classList.remove('show');
+      loadMyLeads();
+    } catch (e) {
+      showToast('Failed to add lead: ' + e.message, 'error');
+    }
+  }
+
+  // Save call log from modal
+  async function saveCallLog() {
+    const modal = document.getElementById('callModal');
+    const callStatus = modal.querySelector('select').value.toUpperCase().replace(/ /g, '_');
+    const duration = parseInt(modal.querySelector('input[type="number"]').value) || 0;
+    const remarks = modal.querySelector('textarea').value.trim();
+    const nextFollowUpDate = modal.querySelector('input[type="date"]').value;
+
+    try {
+      // Create call record
+      await apiPost('/api/callrecords', {
+        lead: { id: currentLeadId },
+        counselor: { id: getCounselorId() },
+        callDate: new Date().toISOString(),
+        callStatus: callStatus,
+        durationMinutes: duration,
+        remarks: remarks,
+        nextFollowUpDate: nextFollowUpDate ? nextFollowUpDate + 'T00:00:00' : null
+      });
+
+      // If next follow-up date provided, schedule it
+      if (nextFollowUpDate) {
+        await apiPost('/api/followups', {
+          lead: { id: currentLeadId },
+          counselor: { id: getCounselorId() },
+          scheduledDate: nextFollowUpDate + 'T09:00:00',
+          notes: remarks,
+          status: 'SCHEDULED'
+        });
+      }
+
+      showToast('Call logged successfully!', 'success');
+      modal.classList.remove('show');
+      loadMyLeads();
+    } catch (e) {
+      showToast('Failed to log call: ' + e.message, 'error');
+    }
+  }
+
+  let currentLeadId = null;
+
+  // Open call modal with lead info
+  function openCallModal(leadId, leadName) {
+    currentLeadId = leadId;
+    document.getElementById('callModal').querySelector('.modal-title').textContent = 'Log Call — ' + leadName;
+    document.getElementById('callModal').classList.add('show');
+  }
+
+  // Update lead status from modal
+  async function updateLeadStatus() {
+    const modal = document.getElementById('statusModal');
+    const stage = enumStage(modal.querySelector('select').value);
+    const comment = modal.querySelector('textarea').value.trim();
+    const followUpDate = modal.querySelector('input[type="date"]').value;
+
+    try {
+      const lead = await apiGet('/api/leads/' + currentLeadId);
+      lead.stage = stage;
+      await apiPut('/api/leads/' + currentLeadId, lead);
+
+      if (followUpDate) {
+        await apiPost('/api/followups', {
+          lead: { id: currentLeadId },
+          counselor: { id: getCounselorId() },
+          scheduledDate: followUpDate + 'T09:00:00',
+          notes: comment,
+          status: 'SCHEDULED'
+        });
+      }
+
+      showToast('Status updated successfully!', 'success');
+      modal.classList.remove('show');
+      loadMyLeads();
+    } catch (e) {
+      showToast('Failed to update status: ' + e.message, 'error');
+    }
+  }
+
+  function openStatusModal(leadId) {
+    currentLeadId = leadId;
+    document.getElementById('statusModal').classList.add('show');
+  }
+
+  // Update onclick handlers in table to use new functions
+  document.addEventListener('DOMContentLoaded', () => {
+    loadMyLeads();
+  });
+</script>
+<script src="frontend-qa.js"></script>
+</body>
+</html>
+
+

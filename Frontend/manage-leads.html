@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM — Manage Leads</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #4f8ef7;
+    --accent2: #6ee7b7;
+    --accent3: #f59e42;
+    --accent4: #f87171;
+    --accent5: #a78bfa;
+    --sidebar-w: 230px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .brand {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .role-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .nav-section {
+    padding: 16px 12px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 13.5px;
+    font-weight: 400;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); font-weight: 500; }
+
+  .nav-item .icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent5));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-info .name { font-weight: 500; font-size: 13px; }
+  .user-info .role { font-size: 11px; color: var(--muted); }
+
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .tag-filter {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tag {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+
+  .tag:hover, .tag.active { background: rgba(79,142,247,0.15); border-color: var(--accent); color: var(--accent); }
+  .tag.google.active { background: rgba(110,231,183,0.12); border-color: var(--accent2); color: var(--accent2); }
+  .tag.insta.active { background: rgba(167,139,250,0.12); border-color: var(--accent5); color: var(--accent5); }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #3d7de8; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .lead-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .lead-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lead-table td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .lead-table tr:last-child td { border-bottom: none; }
+  .lead-table tbody tr { transition: background 0.12s; }
+  .lead-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+  .stage-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .pill-open { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .pill-cnr { background: rgba(245,158,66,0.15); color: var(--accent3); }
+  .pill-callback { background: rgba(167,139,250,0.15); color: var(--accent5); }
+  .pill-s2 { background: rgba(110,231,183,0.15); color: var(--accent2); }
+  .pill-done { background: rgba(251,146,60,0.15); color: #fb923c; }
+
+  .source-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .src-meta { background: rgba(79,142,247,0.12); color: var(--accent); }
+  .src-google { background: rgba(110,231,183,0.12); color: var(--accent2); }
+  .src-insta { background: rgba(167,139,250,0.12); color: var(--accent5); }
+  .src-walkin { background: rgba(245,158,66,0.12); color: var(--accent3); }
+
+  .search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .search-row input {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    width: 240px;
+    font-family: var(--font-body);
+  }
+
+  .search-row input:focus { border-color: var(--accent); }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+  }
+
+  .page-btn {
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .page-btn:hover, .page-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 26px 28px;
+    width: 440px;
+    max-width: 95vw;
+    animation: fadeUp 0.2s ease;
+  }
+
+  .modal-title {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-row.full { grid-template-columns: 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-group label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-group input, .form-group select {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--bg3); }
+
+  .upload-zone {
+    border: 2px dashed var(--border2);
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+  .upload-zone:hover { border-color: var(--accent); }
+  .upload-zone .up-icon { font-size: 28px; margin-bottom: 8px; }
+  .upload-zone .up-text { font-size: 13px; color: var(--muted); }
+  .upload-zone .up-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .mapping-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .mapping-row:last-child { border-bottom: none; }
+  .mapping-row .mcol { font-size: 12px; color: var(--muted); min-width: 80px; }
+  .mapping-row .marrow { color: var(--accent); font-size: 11px; }
+  .mapping-row select {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--text);
+    font-size: 12px;
+    flex: 1;
+  }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">SahilCRM</div>
+    <span class="role-badge">Admin</span>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <a href="admin-dashboard.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a href="manage-users.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Manage Users
+    <span class="badge">5</span>
+  </a>
+  <a href="manage-lists.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+    Manage Lists
+  </a>
+  <a href="manage-leads.html" class="nav-item active">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    Manage Leads
+    <span class="badge">248</span>
+  </a>
+  <a href="courses.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    Courses
+  </a>
+
+  <div class="nav-section">Analytics</div>
+  <a href="reports.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Reports
+  </a>
+  <a href="follow-ups.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Follow-ups
+  </a>
+  <a href="call-records.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 012.08 4.18 2 2 0 014.06 2h3a2 2 0 012 1.72c.12.9.33 1.77.62 2.61a2 2 0 01-.45 2.11L8 9.67a16 16 0 006.33 6.33l1.23-1.23a2 2 0 012.11-.45c.84.29 1.71.5 2.61.62A2 2 0 0122 16.92z"/></svg>
+    Call Records
+  </a>
+  <a href="admissions.html" class="nav-item">
+    Admissions
+  </a>
+
+  <div class="nav-section">System</div>
+  <a href="settings.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">SA</div>
+      <div class="user-info">
+        <div class="name">Super Admin</div>
+        <div class="role">admin@SahilCRM.in</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Manage Leads</div>
+    <div class="topbar-right">
+      <div class="tag-filter">
+        <span class="tag meta active" onclick="this.classList.toggle('active')">Meta</span>
+        <span class="tag google" onclick="this.classList.toggle('active')">Google</span>
+        <span class="tag insta" onclick="this.classList.toggle('active')">Instagram</span>
+        <span class="tag" onclick="this.classList.toggle('active')">Walk-in</span>
+      </div>
+      <button class="btn btn-outline" onclick="document.getElementById('importModal').classList.add('show')">Import CSV</button>
+      <button class="btn btn-primary" onclick="document.getElementById('leadModal').classList.add('show')">+ Add Lead</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="panel">
+      <div class="section-header">
+        <div class="section-title">All Leads</div>
+        <div class="search-row">
+          <input type="text" id="leadSearch" placeholder="Search leads..." oninput="filterTable('.lead-table', this.value)"/>
+          <button class="btn btn-outline" onclick="filterBySource()">Filter</button>
+          <button class="btn btn-outline" onclick="exportTableToCSV('.lead-table', 'leads.csv')">Export</button>
+        </div>
+      </div>
+      <table class="lead-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Course</th>
+            <th>Source</th>
+            <th>Stage</th>
+            <th>Assigned To</th>
+            <th>Date Added</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <button class="page-btn"><</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW LEAD MODAL -->
+<div class="modal-overlay" id="viewLeadModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal" style="width:480px;">
+    <div class="modal-title">Lead Details</div>
+    <div class="form-row">
+      <div class="form-group"><label>First Name</label><input type="text" id="viewFirstName" readonly/></div>
+      <div class="form-group"><label>Last Name</label><input type="text" id="viewLastName" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Phone</label><input type="text" id="viewPhone" readonly/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="viewEmail" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Course</label><input type="text" id="viewCourse" readonly/></div>
+      <div class="form-group"><label>Source</label><input type="text" id="viewSource" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Stage</label><input type="text" id="viewStage" readonly/></div>
+      <div class="form-group"><label>Assigned To</label><input type="text" id="viewAssigned" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>College</label><input type="text" id="viewCollege" readonly/></div>
+      <div class="form-group"><label>University</label><input type="text" id="viewUniversity" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Qualification</label><input type="text" id="viewQualification" readonly/></div>
+      <div class="form-group"><label>Location</label><input type="text" id="viewLocation" readonly/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('viewLeadModal').classList.remove('show')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="leadModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Add New Lead</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" placeholder="Arjun"/>
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" placeholder="Rao"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" placeholder="+91 98765 43210"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="email@example.com"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Course</label>
+        <select>
+          <option>MBA</option>
+          <option>MCA</option>
+          <option>BBA</option>
+          <option>BCA</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Source</label>
+        <select>
+          <option>Meta</option>
+          <option>Google</option>
+          <option>Instagram</option>
+          <option>Walk-in</option>
+          <option>Inbound</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>College</label>
+        <input type="text" placeholder="College name"/>
+      </div>
+      <div class="form-group">
+        <label>University</label>
+        <input type="text" placeholder="University name"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Qualification</label>
+        <select>
+          <option>High School</option>
+          <option>Diploma</option>
+          <option>Bachelor's</option>
+          <option>Master's</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" placeholder="City"/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Assign To Counselor</label>
+        <select>
+          <option>Rahul Kumar</option>
+          <option>Priya Sharma</option>
+          <option>Ankit Mehta</option>
+          <option>Sneha Desai</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('leadModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal" style="width:520px;">
+    <div class="modal-title">Import Leads from CSV / Excel</div>
+    <div class="upload-zone">
+      <div class="up-icon">📁</div>
+      <div class="up-text">Drop your file here or click to browse</div>
+      <div class="up-sub">Supports .csv, .xlsx (Max 2,000 rows)</div>
+    </div>
+    <div style="margin-bottom:12px; font-size:12px; color:var(--muted);">Map CSV columns to lead fields:</div>
+    <div class="mapping-row">
+      <div class="mcol">Column A</div>
+      <div class="marrow">→</div>
+      <select><option>Name</option><option>Email</option><option>Phone</option><option>Country Code</option><option>Course</option></select>
+    </div>
+    <div class="mapping-row">
+      <div class="mcol">Column B</div>
+      <div class="marrow">→</div>
+      <select><option>Email</option><option>Name</option><option>Phone</option><option>Country Code</option><option>Course</option></select>
+    </div>
+    <div class="mapping-row">
+      <div class="mcol">Column C</div>
+      <div class="marrow">→</div>
+      <select><option>Country Code</option><option>Name</option><option>Email</option><option>Phone</option><option>Course</option></select>
+    </div>
+    <div class="mapping-row">
+      <div class="mcol">Column D</div>
+      <div class="marrow">→</div>
+      <select><option>Phone</option><option>Name</option><option>Email</option><option>Country Code</option><option>Course</option></select>
+    </div>
+    <div class="form-row full" style="margin-top:12px;">
+      <div class="form-group">
+        <label>Assign List / Tag</label>
+        <select>
+          <option>Meta Campaign Apr25</option>
+          <option>Google Ads Apr25</option>
+          <option>Instagram Apr25</option>
+          <option>Walk-in Apr25</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Assign To Counselor</label>
+        <select>
+          <option>Rahul Kumar</option>
+          <option>Priya Sharma</option>
+          <option>Ankit Mehta</option>
+          <option>Sneha Desai</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('importModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="showToast('CSV import feature coming soon', 'info')">Import 0 Leads</button>
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+  async function loadLeads() {
+    try {
+      const leads = await apiGet('/api/leads').catch(() => []);
+      const tbody = document.querySelector('.lead-table tbody');
+      if (tbody && leads.length > 0) {
+        tbody.innerHTML = leads.map(l => {
+          const stageClass = { OPEN:'pill-open', CNR:'pill-cnr', CALLBACK:'pill-callback', STAGE2:'pill-s2', STAGE2_5:'pill-s2', ADMITTED:'pill-done' }[l.stage] || 'pill-open';
+          const stageLabel = { OPEN:'Open', CNR:'CNR', CALLBACK:'Call Back', STAGE2:'Stage 2', STAGE2_5:'Stage 2.5', ADMITTED:'Admitted' }[l.stage] || l.stage;
+          const srcClass = { META:'src-meta', GOOGLE:'src-google', INSTAGRAM:'src-insta', WALKIN:'src-walkin', INBOUND:'src-walkin' }[l.source] || 'src-meta';
+          const srcLabel = { META:'Meta', GOOGLE:'Google', INSTAGRAM:'Instagram', WALKIN:'Walk-in', INBOUND:'Inbound' }[l.source] || l.source;
+          return `<tr>
+            <td><strong>${l.firstName} ${l.lastName}</strong><br><span style="color:var(--muted); font-size:11px;">${l.email}</span></td>
+            <td>${l.countryCode || '+91'} ${l.phone}</td>
+            <td>${l.course}</td>
+            <td><span class="source-tag ${srcClass}">${srcLabel}</span></td>
+            <td><span class="stage-pill ${stageClass}">${stageLabel}</span></td>
+            <td>${l.assignedTo ? l.assignedTo.name : 'Unassigned'}</td>
+            <td>${new Date(l.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="viewLead(${l.id})">View</button></td>
+          </tr>`;
+        }).join('');
+      }
+    } catch (e) {
+      console.log('Leads fetch failed:', e.message);
+    }
+  }
+
+  loadLeads();
+
+  async function viewLead(id) {
+    try {
+      const lead = await apiGet('/api/leads/' + id);
+      document.getElementById('viewFirstName').value = lead.firstName || '';
+      document.getElementById('viewLastName').value = lead.lastName || '';
+      document.getElementById('viewPhone').value = (lead.countryCode || '+91') + ' ' + (lead.phone || '');
+      document.getElementById('viewEmail').value = lead.email || '';
+      document.getElementById('viewCourse').value = lead.course || '';
+      document.getElementById('viewSource').value = srcLabel(lead.source);
+      document.getElementById('viewStage').value = stageLabel(lead.stage);
+      document.getElementById('viewAssigned').value = lead.assignedTo ? lead.assignedTo.name : 'Unassigned';
+      document.getElementById('viewCollege').value = lead.college || '';
+      document.getElementById('viewUniversity').value = lead.university || '';
+      document.getElementById('viewQualification').value = lead.qualification || '';
+      document.getElementById('viewLocation').value = lead.location || '';
+      document.getElementById('viewLeadModal').classList.add('show');
+    } catch (e) {
+      showToast('Failed to load lead: ' + e.message, 'error');
+    }
+  }
+
+  async function saveLead() {
+    const modal = document.getElementById('leadModal');
+    const inputs = modal.querySelectorAll('input');
+    const selects = modal.querySelectorAll('select');
+    const firstName = inputs[0].value.trim();
+    const lastName = inputs[1].value.trim();
+    const phone = inputs[2].value.trim();
+    const email = inputs[3].value.trim();
+    const course = selects[0].value;
+    const source = enumSource(selects[1].value);
+    const college = inputs[4].value.trim();
+    const university = inputs[5].value.trim();
+    const qualification = enumQualification(selects[2].value);
+    const location = inputs[6].value.trim();
+
+    if (!firstName || !lastName || !phone || !email || !course) {
+      showToast('Please fill first name, last name, phone, email and course', 'error');
+      return;
+    }
+
+    try {
+      await apiPost('/api/leads', {
+        firstName, lastName, phone, email, course, source,
+        college, university, qualification, location,
+        stage: 'OPEN'
+      });
+      showToast('Lead saved successfully', 'success');
+      modal.classList.remove('show');
+      modal.querySelectorAll('input').forEach(input => input.value = '');
+      loadLeads();
+    } catch (e) {
+      showToast('Failed to save lead: ' + e.message, 'error');
+    }
+  }
+
+  function filterBySource() {
+    const activeSources = Array.from(document.querySelectorAll('.tag.active')).map(tag => tag.textContent.trim().toLowerCase());
+    const rows = document.querySelectorAll('.lead-table tbody tr');
+    if (!activeSources.length) {
+      rows.forEach(row => row.style.display = '');
+      return;
+    }
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = activeSources.some(source => text.includes(source)) ? '' : 'none';
+    });
+  }
+</script>
+<script src="frontend-qa.js"></script>
+</body>
+</html>

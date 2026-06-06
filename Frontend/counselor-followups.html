@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM — My Follow-ups</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #4f8ef7;
+    --accent2: #6ee7b7;
+    --accent3: #f59e42;
+    --accent4: #f87171;
+    --accent5: #a78bfa;
+    --sidebar-w: 230px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .brand {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .role-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    background: rgba(110,231,183,0.1);
+    border: 1px solid rgba(110,231,183,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .nav-section {
+    padding: 16px 12px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 13.5px;
+    font-weight: 400;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); font-weight: 500; }
+
+  .nav-item .icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-info .name { font-weight: 500; font-size: 13px; }
+  .user-info .role { font-size: 11px; color: var(--muted); }
+
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #3d7de8; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .value {
+    font-family: var(--font-head);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stat-card.today .value { color: var(--accent); }
+  .stat-card.overdue .value { color: var(--accent4); }
+  .stat-card.week .value { color: var(--accent5); }
+  .stat-card.completed .value { color: var(--accent2); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  /* CALENDAR */
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .cal-nav {
+    display: flex;
+    gap: 8px;
+  }
+
+  .cal-nav button {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .cal-nav button:hover { color: var(--text); }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cal-day-header {
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 0;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .cal-day:hover { border-color: var(--border2); }
+  .cal-day.today { border-color: var(--accent); background: rgba(79,142,247,0.08); }
+  .cal-day.has-event::after {
+    content: '';
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent3);
+    position: absolute;
+    bottom: 6px;
+  }
+  .cal-day .dnum { font-size: 13px; font-weight: 500; }
+  .cal-day.other { opacity: 0.4; }
+
+  .followup-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .followup-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    transition: border-color 0.15s;
+  }
+
+  .followup-row:hover { border-color: var(--border2); }
+
+  .followup-row .time {
+    min-width: 60px;
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .followup-row .info { flex: 1; }
+  .followup-row .info .fname { font-weight: 500; font-size: 13px; }
+  .followup-row .info .fdetail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+  }
+
+  .dot-pending { background: var(--accent3); }
+  .dot-done { background: var(--accent2); }
+  .dot-overdue { background: var(--accent4); }
+
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 26px 28px;
+    width: 440px;
+    max-width: 95vw;
+    animation: fadeUp 0.2s ease;
+  }
+
+  .modal-title {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-row.full { grid-template-columns: 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-group label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-group input, .form-group select, .form-group textarea {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--bg3); }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">SahilCRM</div>
+    <span class="role-badge">Counselor</span>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <a href="counselor-dashboard.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a href="counselor-followups.html" class="nav-item active">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    My Follow-ups
+    <span class="badge">8</span>
+  </a>
+  <a href="counselor-leads.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    My Leads
+    <span class="badge">62</span>
+  </a>
+  <a href="call-records.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 012.08 4.18 2 2 0 014.06 2h3a2 2 0 012 1.72c.12.9.33 1.77.62 2.61a2 2 0 01-.45 2.11L8 9.67a16 16 0 006.33 6.33l1.23-1.23a2 2 0 012.11-.45c.84.29 1.71.5 2.61.62A2 2 0 0122 16.92z"/></svg>
+    Call Records
+  </a>
+  <a href="admissions.html" class="nav-item">
+    Admissions
+  </a>
+
+  <div class="nav-section">Analytics</div>
+  <a href="counselor-reports.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    My Performance
+  </a>
+
+  <div class="nav-section">System</div>
+  <a href="settings.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">RK</div>
+      <div class="user-info">
+        <div class="name">Rahul Kumar</div>
+        <div class="role">rahul@SahilCRM.in</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">My Follow-ups</div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="document.getElementById('scheduleModal').classList.add('show')">+ Schedule Follow-up</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card today">
+        <div class="label">Today</div>
+        <div class="value">5</div>
+        <div class="sub">2 completed, 3 pending</div>
+      </div>
+      <div class="stat-card overdue">
+        <div class="label">Overdue</div>
+        <div class="value">3</div>
+        <div class="sub">Needs immediate attention</div>
+      </div>
+      <div class="stat-card week">
+        <div class="label">This Week</div>
+        <div class="value">12</div>
+        <div class="sub">Scheduled</div>
+      </div>
+      <div class="stat-card completed">
+        <div class="label">Completed</div>
+        <div class="value">28</div>
+        <div class="sub">This month</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="calendar-header">
+          <div class="section-title">April 2025</div>
+          <div class="cal-nav">
+            <button><</button>
+            <button>Today</button>
+            <button>></button>
+          </div>
+        </div>
+        <div class="calendar-grid">
+          <div class="cal-day-header">Sun</div>
+          <div class="cal-day-header">Mon</div>
+          <div class="cal-day-header">Tue</div>
+          <div class="cal-day-header">Wed</div>
+          <div class="cal-day-header">Thu</div>
+          <div class="cal-day-header">Fri</div>
+          <div class="cal-day-header">Sat</div>
+
+          <div class="cal-day other"><div class="dnum">30</div></div>
+          <div class="cal-day other"><div class="dnum">31</div></div>
+          <div class="cal-day"><div class="dnum">1</div></div>
+          <div class="cal-day"><div class="dnum">2</div></div>
+          <div class="cal-day has-event"><div class="dnum">3</div></div>
+          <div class="cal-day"><div class="dnum">4</div></div>
+          <div class="cal-day"><div class="dnum">5</div></div>
+
+          <div class="cal-day has-event"><div class="dnum">6</div></div>
+          <div class="cal-day"><div class="dnum">7</div></div>
+          <div class="cal-day has-event"><div class="dnum">8</div></div>
+          <div class="cal-day"><div class="dnum">9</div></div>
+          <div class="cal-day"><div class="dnum">10</div></div>
+          <div class="cal-day has-event"><div class="dnum">11</div></div>
+          <div class="cal-day"><div class="dnum">12</div></div>
+
+          <div class="cal-day"><div class="dnum">13</div></div>
+          <div class="cal-day has-event"><div class="dnum">14</div></div>
+          <div class="cal-day"><div class="dnum">15</div></div>
+          <div class="cal-day has-event"><div class="dnum">16</div></div>
+          <div class="cal-day"><div class="dnum">17</div></div>
+          <div class="cal-day"><div class="dnum">18</div></div>
+          <div class="cal-day has-event"><div class="dnum">19</div></div>
+
+          <div class="cal-day"><div class="dnum">20</div></div>
+          <div class="cal-day has-event"><div class="dnum">21</div></div>
+          <div class="cal-day"><div class="dnum">22</div></div>
+          <div class="cal-day has-event"><div class="dnum">23</div></div>
+          <div class="cal-day"><div class="dnum">24</div></div>
+          <div class="cal-day today has-event"><div class="dnum">25</div></div>
+          <div class="cal-day has-event"><div class="dnum">26</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-header">
+          <div class="section-title">Today's Schedule</div>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 11px;">View All</button>
+        </div>
+        <div class="followup-list">
+          <div class="followup-row">
+            <div class="time">10:30</div>
+            <div class="info">
+              <div class="fname">Neha Joshi — MCA</div>
+              <div class="fdetail"><span class="status-dot dot-pending"></span>Stage 2.5 · Follow-up call</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Call</button>
+          </div>
+          <div class="followup-row">
+            <div class="time">12:00</div>
+            <div class="info">
+              <div class="fname">Sana Shaikh — MCA</div>
+              <div class="fdetail"><span class="status-dot dot-done"></span>Open · First contact</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Done</button>
+          </div>
+          <div class="followup-row">
+            <div class="time">14:00</div>
+            <div class="info">
+              <div class="fname">Karan Malhotra — MBA</div>
+              <div class="fdetail"><span class="status-dot dot-pending"></span>Call Back · Fee discussion</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Call</button>
+          </div>
+          <div class="followup-row">
+            <div class="time">16:30</div>
+            <div class="info">
+              <div class="fname">Divya Nair — BBA</div>
+              <div class="fdetail"><span class="status-dot dot-overdue"></span>Stage 2 · Overdue by 1 day</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Call</button>
+          </div>
+          <div class="followup-row">
+            <div class="time">17:00</div>
+            <div class="info">
+              <div class="fname">Rohit Sen — BCA</div>
+              <div class="fdetail"><span class="status-dot dot-pending"></span>CNR · 3rd attempt</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Call</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:0;">
+      <div class="section-header">
+        <div class="section-title">Upcoming Follow-ups</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" placeholder="Search..." style="background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:6px 12px; color:var(--text); font-size:12px; outline:none; width:160px;"/>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 11px;">Filter</button>
+        </div>
+      </div>
+      <table class="lead-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:8px 10px; color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border);">Student</th>
+            <th style="text-align:left; padding:8px 10px; color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border);">Date</th>
+            <th style="text-align:left; padding:8px 10px; color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border);">Type</th>
+            <th style="text-align:left; padding:8px 10px; color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border);">Status</th>
+            <th style="text-align:left; padding:8px 10px; color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border);">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>Neha Joshi</strong><br><span style="color:var(--muted); font-size:11px;">+91 87654 32109</span></td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Apr 25, 10:30 AM</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Follow-up call</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot dot-pending"></span>Pending</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>Karan Malhotra</strong><br><span style="color:var(--muted); font-size:11px;">+91 99887 76655</span></td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Apr 25, 2:00 PM</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Fee discussion</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot dot-pending"></span>Pending</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>Divya Nair</strong><br><span style="color:var(--muted); font-size:11px;">+91 88776 65544</span></td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Apr 24, 4:00 PM</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Stage update</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot dot-overdue"></span>Overdue</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>Rohit Sen</strong><br><span style="color:var(--muted); font-size:11px;">+91 77665 54433</span></td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Apr 25, 5:00 PM</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Retry call</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot dot-pending"></span>Pending</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 10px;"><strong>Arjun Rao</strong><br><span style="color:var(--muted); font-size:11px;">+91 98765 43210</span></td>
+            <td style="padding:10px 10px;">Apr 27, 11:00 AM</td>
+            <td style="padding:10px 10px;">Document collection</td>
+            <td style="padding:10px 10px;"><span class="status-dot dot-pending"></span>Pending</td>
+            <td style="padding:10px 10px;"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="scheduleModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Schedule Follow-up</div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Select Lead</label>
+        <select>
+          <option>Neha Joshi — MCA</option>
+          <option>Sana Shaikh — MCA</option>
+          <option>Karan Malhotra — MBA</option>
+          <option>Divya Nair — BBA</option>
+          <option>Rohit Sen — BCA</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date"/>
+      </div>
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time"/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Follow-up Type</label>
+        <select>
+          <option>Phone Call</option>
+          <option>Video Call</option>
+          <option>In-person Meeting</option>
+          <option>WhatsApp Message</option>
+          <option>Email</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Notes / Purpose</label>
+        <textarea placeholder="What needs to be discussed?"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('scheduleModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="scheduleFollowup()">Schedule</button>
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+  const user2 = getCurrentUser();
+  const counselorId2 = user2.id || 3;
+
+  async function loadFollowups() {
+    try {
+      const [followups, leads] = await Promise.all([
+        apiGet('/api/followups/counselor/' + counselorId2).catch(() => []),
+        apiGet('/api/leads/counselor/' + counselorId2).catch(() => [])
+      ]);
+
+      const today = new Date().toISOString().split('T')[0];
+      const todayFups = followups.filter(f => f.scheduledDate && f.scheduledDate.startsWith(today));
+      const overdueFups = followups.filter(f => f.scheduledDate && f.scheduledDate < today && f.status === 'SCHEDULED');
+      const completedFups = followups.filter(f => f.status === 'COMPLETED');
+
+      // Update stats
+      const statCards = document.querySelectorAll('.stats-grid .stat-card');
+      if (statCards[0]) statCards[0].querySelector('.value').textContent = todayFups.length;
+      if (statCards[1]) statCards[1].querySelector('.value').textContent = overdueFups.length;
+      if (statCards[2]) statCards[2].querySelector('.value').textContent = followups.filter(f => f.scheduledDate >= today).length;
+      if (statCards[3]) statCards[3].querySelector('.value').textContent = completedFups.length;
+
+      // Load today's schedule
+      const followupList = document.querySelector('.followup-list');
+      if (followupList && followups.length > 0) {
+        const todayItems = followups
+          .filter(f => f.scheduledDate && f.scheduledDate.startsWith(today))
+          .sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate));
+        followupList.innerHTML = todayItems.map(f => {
+          const d = new Date(f.scheduledDate);
+          const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+          const lead = f.lead || {};
+          const isDone = f.status === 'COMPLETED';
+          return `<div class="followup-row">
+            <div class="time">${time}</div>
+            <div class="info">
+              <div class="fname">${lead.firstName || ''} ${lead.lastName || ''} — ${lead.course || ''}</div>
+              <div class="fdetail"><span class="status-dot ${isDone ? 'dot-done' : 'dot-pending'}"></span>${stageLabel(lead.stage || 'OPEN')} · ${f.notes || 'Follow-up'}</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;" onclick="markDone(${f.id}, ${!isDone})">${isDone ? 'Done' : 'Mark Done'}</button>
+          </div>`;
+        }).join('');
+      }
+
+      // Load upcoming follow-ups table
+      const tbody = document.querySelector('.lead-table tbody');
+      if (tbody && followups.length > 0) {
+        tbody.innerHTML = followups.map(f => {
+          const lead = f.lead || {};
+          return `<tr>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>${lead.firstName || ''} ${lead.lastName || ''}</strong><br><span style="color:var(--muted); font-size:11px;">${lead.countryCode || '+91'} ${lead.phone || ''}</span></td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">${fmtDate(f.scheduledDate)}</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">${f.notes || 'Follow-up'}</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot ${f.status === 'COMPLETED' ? 'dot-done' : f.scheduledDate < today ? 'dot-overdue' : 'dot-pending'}"></span>${f.status === 'COMPLETED' ? 'Completed' : f.scheduledDate < today ? 'Overdue' : 'Pending'}</td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="location.href='tel:${lead.phone || ''}'">Call</button></td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Populate lead dropdown in schedule modal
+      const leadSelect = document.querySelector('#scheduleModal select');
+      if (leadSelect && leads.length > 0) {
+        leadSelect.innerHTML = leads.map(l => `<option value="${l.id}">${l.firstName} ${l.lastName} — ${l.course}</option>`).join('');
+      }
+    } catch (e) {
+      console.log('Follow-ups load failed:', e.message);
+    }
+  }
+
+  async function scheduleFollowup() {
+    const modal = document.getElementById('scheduleModal');
+    const leadId = modal.querySelector('select').value;
+    const date = modal.querySelector('input[type="date"]').value;
+    const time = modal.querySelector('input[type="time"]').value;
+    const type = modal.querySelectorAll('select')[1].value;
+    const notes = modal.querySelector('textarea').value.trim();
+
+    if (!leadId || !date || !time) {
+      showToast('Please fill all required fields', 'error');
+      return;
+    }
+
+    try {
+      await apiPost('/api/followups', {
+        lead: { id: leadId },
+        counselor: { id: counselorId2 },
+        scheduledDate: date + 'T' + time,
+        notes: type + (notes ? ': ' + notes : ''),
+        status: 'SCHEDULED'
+      });
+      showToast('Follow-up scheduled!', 'success');
+      modal.classList.remove('show');
+      loadFollowups();
+    } catch (e) {
+      showToast('Failed to schedule: ' + e.message, 'error');
+    }
+  }
+
+  async function markDone(followupId, done) {
+    try {
+      await apiPut('/api/followups/' + followupId, { status: done ? 'COMPLETED' : 'SCHEDULED' });
+      showToast(done ? 'Marked as done!' : 'Reopened!', 'success');
+      loadFollowups();
+    } catch (e) {
+      showToast('Failed: ' + e.message, 'error');
+    }
+  }
+
+  loadFollowups();
+</script>
+<script src="frontend-qa.js"></script>
+</body>
+</html>
+

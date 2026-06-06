@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #4f8ef7;
+    --accent2: #6ee7b7;
+    --accent3: #f59e42;
+    --accent4: #f87171;
+    --accent5: #a78bfa;
+    --sidebar-w: 230px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .brand {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .role-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .nav-section {
+    padding: 16px 12px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 13.5px;
+    font-weight: 400;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); font-weight: 500; }
+
+  .nav-item .icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent5));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-info .name { font-weight: 500; font-size: 13px; }
+  .user-info .role { font-size: 11px; color: var(--muted); }
+
+  /* MAIN */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .tag-filter {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tag {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+
+  .tag:hover, .tag.active { background: rgba(79,142,247,0.15); border-color: var(--accent); color: var(--accent); }
+  .tag.meta.active { background: rgba(79,142,247,0.15); border-color: var(--accent); color: var(--accent); }
+  .tag.google.active { background: rgba(110,231,183,0.12); border-color: var(--accent2); color: var(--accent2); }
+  .tag.insta.active { background: rgba(167,139,250,0.12); border-color: var(--accent5); color: var(--accent5); }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .icon-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+
+  /* CONTENT */
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color 0.18s;
+    cursor: default;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .stat-card:hover { border-color: var(--border2); }
+
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .value {
+    font-family: var(--font-head);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stat-card.open .value { color: var(--accent); }
+  .stat-card.cnr .value { color: var(--accent3); }
+  .stat-card.callback .value { color: var(--accent5); }
+  .stat-card.s2 .value { color: var(--accent2); }
+  .stat-card.s25 .value { color: #34d399; }
+  .stat-card.done .value { color: #fb923c; }
+
+  /* PIPELINE */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+  }
+
+  .btn-primary:hover { background: #3d7de8; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  /* PIPELINE BAR */
+  .pipeline-stages {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .stage-block {
+    flex: 1;
+    text-align: center;
+  }
+
+  .stage-bar-wrap {
+    height: 60px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .stage-bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.6s ease;
+  }
+
+  .stage-label {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  .stage-count {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* LEAD TABLE */
+  .lead-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .lead-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lead-table td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .lead-table tr:last-child td { border-bottom: none; }
+  .lead-table tbody tr { transition: background 0.12s; }
+  .lead-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+  .stage-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .pill-open { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .pill-cnr { background: rgba(245,158,66,0.15); color: var(--accent3); }
+  .pill-callback { background: rgba(167,139,250,0.15); color: var(--accent5); }
+  .pill-s2 { background: rgba(110,231,183,0.15); color: var(--accent2); }
+  .pill-done { background: rgba(251,146,60,0.15); color: #fb923c; }
+
+  .source-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .src-meta { background: rgba(79,142,247,0.12); color: var(--accent); }
+  .src-google { background: rgba(110,231,183,0.12); color: var(--accent2); }
+  .src-insta { background: rgba(167,139,250,0.12); color: var(--accent5); }
+  .src-walkin { background: rgba(245,158,66,0.12); color: var(--accent3); }
+
+  /* COUNSELORS */
+  .counselor-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .counselor-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .counselor-row .av {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .counselor-row .info { flex: 1; }
+  .counselor-row .info .cname { font-size: 13px; font-weight: 500; }
+  .counselor-row .info .cstat { font-size: 11px; color: var(--muted); }
+
+  .perf-bar-wrap {
+    width: 80px;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .perf-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent2);
+  }
+
+  .ccount { font-size: 12px; font-weight: 600; color: var(--text); min-width: 28px; text-align: right; }
+
+  /* ACTIVITY FEED */
+  .activity-list { display: flex; flex-direction: column; gap: 0; }
+
+  .activity-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .activity-item:last-child { border-bottom: none; }
+
+  .act-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .activity-item .act-text { font-size: 12.5px; line-height: 1.5; }
+  .activity-item .act-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .stat-card:nth-child(2) { animation-delay: 0.10s; }
+  .stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .stat-card:nth-child(4) { animation-delay: 0.20s; }
+  .stat-card:nth-child(5) { animation-delay: 0.25s; }
+  .stat-card:nth-child(6) { animation-delay: 0.30s; }
+
+  .dot-green { background: var(--accent2); }
+  .dot-blue { background: var(--accent); }
+  .dot-amber { background: var(--accent3); }
+  .dot-red { background: var(--accent4); }
+  .dot-purple { background: var(--accent5); }
+
+  /* modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 26px 28px;
+    width: 440px;
+    max-width: 95vw;
+    animation: fadeUp 0.2s ease;
+  }
+
+  .modal-title {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-row.full { grid-template-columns: 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-group label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-group input, .form-group select {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--bg3); }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">SahilCRM</div>
+    <span class="role-badge">Admin</span>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <a href="admin-dashboard.html" class="nav-item active">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a href="manage-users.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Manage Users
+    <span class="badge">5</span>
+  </a>
+  <a href="manage-lists.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+    Manage Lists
+  </a>
+  <a href="manage-leads.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    Manage Leads
+    <span class="badge">248</span>
+  </a>
+  <a href="courses.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    Courses
+  </a>
+
+  <div class="nav-section">Analytics</div>
+  <a href="reports.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Reports
+  </a>
+  <a href="follow-ups.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Follow-ups
+  </a>
+  <a href="call-records.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 012.08 4.18 2 2 0 014.06 2h3a2 2 0 012 1.72c.12.9.33 1.77.62 2.61a2 2 0 01-.45 2.11L8 9.67a16 16 0 006.33 6.33l1.23-1.23a2 2 0 012.11-.45c.84.29 1.71.5 2.61.62A2 2 0 0122 16.92z"/></svg>
+    Call Records
+  </a>
+  <a href="admissions.html" class="nav-item">
+    Admissions
+  </a>
+
+  <div class="nav-section">System</div>
+  <a href="settings.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">SA</div>
+      <div class="user-info">
+        <div class="name">Super Admin</div>
+        <div class="role">admin@SahilCRM.in</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">Dashboard Overview</div>
+    <div class="topbar-right">
+      <div class="tag-filter">
+        <span class="tag meta active" onclick="toggleTag(this)">Meta</span>
+        <span class="tag google" onclick="toggleTag(this)">Google</span>
+        <span class="tag insta" onclick="toggleTag(this)">Instagram</span>
+        <span class="tag" onclick="toggleTag(this)">Walk-in</span>
+        <span class="tag" onclick="toggleTag(this)">Inbound</span>
+      </div>
+      <button class="icon-btn" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <button class="btn btn-primary" onclick="document.getElementById('leadModal').classList.add('show')">+ Add Lead</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card open">
+        <div class="label">Open</div>
+        <div class="value">84</div>
+        <div class="sub">↑ 12 this week</div>
+      </div>
+      <div class="stat-card cnr">
+        <div class="label">CNR</div>
+        <div class="value">37</div>
+        <div class="sub">Call Not Reachable</div>
+      </div>
+      <div class="stat-card callback">
+        <div class="label">Call Back</div>
+        <div class="value">29</div>
+        <div class="sub">Scheduled today: 8</div>
+      </div>
+      <div class="stat-card s2">
+        <div class="label">Stage 2</div>
+        <div class="value">52</div>
+        <div class="sub">↑ 6 moved in</div>
+      </div>
+      <div class="stat-card s25">
+        <div class="label">Stage 2.5</div>
+        <div class="value">28</div>
+        <div class="sub">Near conversion</div>
+      </div>
+      <div class="stat-card done">
+        <div class="label">Admitted</div>
+        <div class="value">18</div>
+        <div class="sub">↑ 3 this week</div>
+      </div>
+    </div>
+
+    <!-- PIPELINE + ACTIVITY -->
+    <div class="grid-2">
+
+      <!-- PIPELINE -->
+      <div class="panel">
+        <div class="section-header">
+          <div class="section-title">Lead Pipeline</div>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 11px;">This Month</button>
+        </div>
+        <div class="pipeline-stages">
+          <div class="stage-block">
+            <div class="stage-bar-wrap">
+              <div class="stage-bar" style="height:72%; background: var(--accent); opacity:0.85;"></div>
+            </div>
+            <div class="stage-label">Open</div>
+            <div class="stage-count" style="color:var(--accent)">84</div>
+          </div>
+          <div class="stage-block">
+            <div class="stage-bar-wrap">
+              <div class="stage-bar" style="height:44%; background: var(--accent3); opacity:0.85;"></div>
+            </div>
+            <div class="stage-label">CNR</div>
+            <div class="stage-count" style="color:var(--accent3)">37</div>
+          </div>
+          <div class="stage-block">
+            <div class="stage-bar-wrap">
+              <div class="stage-bar" style="height:34%; background: var(--accent5); opacity:0.85;"></div>
+            </div>
+            <div class="stage-label">Callback</div>
+            <div class="stage-count" style="color:var(--accent5)">29</div>
+          </div>
+          <div class="stage-block">
+            <div class="stage-bar-wrap">
+              <div class="stage-bar" style="height:61%; background: var(--accent2); opacity:0.85;"></div>
+            </div>
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-count" style="color:var(--accent2)">52</div>
+          </div>
+          <div class="stage-block">
+            <div class="stage-bar-wrap">
+              <div class="stage-bar" style="height:33%; background: #34d399; opacity:0.85;"></div>
+            </div>
+            <div class="stage-label">Stage 2.5</div>
+            <div class="stage-count" style="color:#34d399">28</div>
+          </div>
+          <div class="stage-block">
+            <div class="stage-bar-wrap">
+              <div class="stage-bar" style="height:21%; background: #fb923c; opacity:0.85;"></div>
+            </div>
+            <div class="stage-label">Admitted</div>
+            <div class="stage-count" style="color:#fb923c">18</div>
+          </div>
+        </div>
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+          <div class="section-header" style="margin-bottom:10px;">
+            <span style="font-size:12px; color:var(--muted);">Counselor Performance</span>
+          </div>
+          <div class="counselor-list">
+            <div class="counselor-row">
+              <div class="av" style="background: linear-gradient(135deg,#4f8ef7,#a78bfa)">RK</div>
+              <div class="info"><div class="cname">Rahul Kumar</div><div class="cstat">62 leads assigned</div></div>
+              <div class="perf-bar-wrap"><div class="perf-bar" style="width:80%"></div></div>
+              <div class="ccount">80%</div>
+            </div>
+            <div class="counselor-row">
+              <div class="av" style="background: linear-gradient(135deg,#6ee7b7,#4f8ef7)">PS</div>
+              <div class="info"><div class="cname">Priya Sharma</div><div class="cstat">48 leads assigned</div></div>
+              <div class="perf-bar-wrap"><div class="perf-bar" style="width:65%"></div></div>
+              <div class="ccount">65%</div>
+            </div>
+            <div class="counselor-row">
+              <div class="av" style="background: linear-gradient(135deg,#f59e42,#f87171)">AM</div>
+              <div class="info"><div class="cname">Ankit Mehta</div><div class="cstat">55 leads assigned</div></div>
+              <div class="perf-bar-wrap"><div class="perf-bar" style="width:55%; background:var(--accent3);"></div></div>
+              <div class="ccount">55%</div>
+            </div>
+            <div class="counselor-row">
+              <div class="av" style="background: linear-gradient(135deg,#a78bfa,#f87171)">SD</div>
+              <div class="info"><div class="cname">Sneha Desai</div><div class="cstat">41 leads assigned</div></div>
+              <div class="perf-bar-wrap"><div class="perf-bar" style="width:42%; background:var(--accent5);"></div></div>
+              <div class="ccount">42%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY -->
+      <div class="panel">
+        <div class="section-header">
+          <div class="section-title">Recent Activity</div>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 11px;" onclick="window.location.href='follow-ups.html'">View All</button>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="act-dot dot-green"></div>
+            <div>
+              <div class="act-text"><strong>Priya Sharma</strong> converted Arjun Rao to admission — MBA</div>
+              <div class="act-time">2 minutes ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot dot-blue"></div>
+            <div>
+              <div class="act-text">12 new leads imported from <strong>Meta</strong> campaign #Apr25</div>
+              <div class="act-time">18 minutes ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot dot-amber"></div>
+            <div>
+              <div class="act-text"><strong>Rahul Kumar</strong> scheduled follow-up with Neha Joshi — Stage 2.5</div>
+              <div class="act-time">42 minutes ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot dot-purple"></div>
+            <div>
+              <div class="act-text">New user <strong>Anjali Verma</strong> added as counselor</div>
+              <div class="act-time">1 hour ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot dot-blue"></div>
+            <div>
+              <div class="act-text">8 leads from <strong>Google</strong> assigned to Ankit Mehta</div>
+              <div class="act-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot dot-red"></div>
+            <div>
+              <div class="act-text">Riya Patel moved to <strong>CNR</strong> — 3rd attempt, no answer</div>
+              <div class="act-time">3 hours ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot dot-green"></div>
+            <div>
+              <div class="act-text"><strong>Sneha Desai</strong> updated 5 leads to Stage 2</div>
+              <div class="act-time">Yesterday 5:30 PM</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot dot-amber"></div>
+            <div>
+              <div class="act-text">Walk-in list "<strong>Apr-Walkin</strong>" created — 22 leads</div>
+              <div class="act-time">Yesterday 2:10 PM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADS TABLE -->
+    <div class="panel" style="margin-bottom:0;">
+      <div class="section-header">
+        <div class="section-title">Recent Leads</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" id="leadSearch" placeholder="Search leads..." oninput="filterTable('.lead-table', this.value)" style="background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:6px 12px; color:var(--text); font-size:12px; outline:none; width:180px;"/>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 11px;" onclick="exportTableToCSV('.lead-table', 'leads.csv')">Export</button>
+          <button class="btn btn-primary" style="font-size:11px; padding:5px 11px;" onclick="document.getElementById('leadModal').classList.add('show')">+ Add Lead</button>
+        </div>
+      </div>
+      <table class="lead-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Course</th>
+            <th>Source</th>
+            <th>Stage</th>
+            <th>Assigned To</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- VIEW LEAD MODAL -->
+<div class="modal-overlay" id="viewLeadModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal" style="width:480px;">
+    <div class="modal-title">Lead Details</div>
+    <div class="form-row">
+      <div class="form-group"><label>First Name</label><input type="text" id="viewFirstName" readonly/></div>
+      <div class="form-group"><label>Last Name</label><input type="text" id="viewLastName" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Phone</label><input type="text" id="viewPhone" readonly/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="viewEmail" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Course</label><input type="text" id="viewCourse" readonly/></div>
+      <div class="form-group"><label>Source</label><input type="text" id="viewSource" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Stage</label><input type="text" id="viewStage" readonly/></div>
+      <div class="form-group"><label>Assigned To</label><input type="text" id="viewAssigned" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>College</label><input type="text" id="viewCollege" readonly/></div>
+      <div class="form-group"><label>University</label><input type="text" id="viewUniversity" readonly/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Qualification</label><input type="text" id="viewQualification" readonly/></div>
+      <div class="form-group"><label>Location</label><input type="text" id="viewLocation" readonly/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('viewLeadModal').classList.remove('show')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LEAD MODAL -->
+<div class="modal-overlay" id="leadModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Add New Lead</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" placeholder="Arjun"/>
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" placeholder="Rao"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" placeholder="+91 98765 43210"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="email@example.com"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Course</label>
+        <select>
+          <option>MBA</option>
+          <option>MCA</option>
+          <option>BBA</option>
+          <option>BCA</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Source</label>
+        <select>
+          <option>Meta</option>
+          <option>Google</option>
+          <option>Instagram</option>
+          <option>Walk-in</option>
+          <option>Inbound</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>College</label>
+        <input type="text" placeholder="College name"/>
+      </div>
+      <div class="form-group">
+        <label>University</label>
+        <input type="text" placeholder="University name"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Qualification</label>
+        <select>
+          <option>High School</option>
+          <option>Diploma</option>
+          <option>Bachelor's</option>
+          <option>Master's</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" placeholder="City"/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Assign To Counselor</label>
+        <select>
+          <option>Rahul Kumar</option>
+          <option>Priya Sharma</option>
+          <option>Ankit Mehta</option>
+          <option>Sneha Desai</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('leadModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+  function setActive(el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function toggleTag(el) {
+    el.classList.toggle('active');
+  }
+
+  async function loadDashboardData() {
+    try {
+      const [leadsRes, usersRes, coursesRes, admissionsRes] = await Promise.all([
+        apiGet('/api/leads').catch(() => []),
+        apiGet('/api/users').catch(() => []),
+        apiGet('/api/courses').catch(() => []),
+        apiGet('/api/admissions').catch(() => [])
+      ]);
+
+      const counts = { OPEN:0, CNR:0, CALLBACK:0, STAGE2:0, STAGE2_5:0, ADMITTED:0 };
+      leadsRes.forEach(l => { if (counts[l.stage] !== undefined) counts[l.stage]++; });
+
+      const statCards = document.querySelectorAll('.stats-grid .stat-card .value');
+      if (statCards[0]) statCards[0].textContent = counts.OPEN;
+      if (statCards[1]) statCards[1].textContent = counts.CNR;
+      if (statCards[2]) statCards[2].textContent = counts.CALLBACK;
+      if (statCards[3]) statCards[3].textContent = counts.STAGE2;
+      if (statCards[4]) statCards[4].textContent = counts.STAGE2_5;
+      if (statCards[5]) statCards[5].textContent = counts.ADMITTED;
+
+      const stageCounts = document.querySelectorAll('.stage-count');
+      if (stageCounts[0]) stageCounts[0].textContent = counts.OPEN;
+      if (stageCounts[1]) stageCounts[1].textContent = counts.CNR;
+      if (stageCounts[2]) stageCounts[2].textContent = counts.CALLBACK;
+      if (stageCounts[3]) stageCounts[3].textContent = counts.STAGE2;
+      if (stageCounts[4]) stageCounts[4].textContent = counts.STAGE2_5;
+      if (stageCounts[5]) stageCounts[5].textContent = counts.ADMITTED;
+
+      const counselors = usersRes.filter(u => u.role === 'COUNSELOR');
+      const counselorList = document.querySelector('.counselor-list');
+      if (counselorList && counselors.length > 0) {
+        counselorList.innerHTML = counselors.map(c => {
+          const assigned = leadsRes.filter(l => l.assignedTo && l.assignedTo.id === c.id).length;
+          const converted = leadsRes.filter(l => l.assignedTo && l.assignedTo.id === c.id && l.stage === 'ADMITTED').length;
+          const pct = assigned > 0 ? Math.round((converted / assigned) * 100) : 0;
+          const initials = c.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+          return `<div class="counselor-row">
+            <div class="av" style="background: linear-gradient(135deg,var(--accent),var(--accent5))">${initials}</div>
+            <div class="info"><div class="cname">${c.name}</div><div class="cstat">${assigned} leads assigned</div></div>
+            <div class="perf-bar-wrap"><div class="perf-bar" style="width:${pct}%"></div></div>
+            <div class="ccount">${pct}%</div>
+          </div>`;
+        }).join('');
+      }
+
+      const tbody = document.querySelector('.lead-table tbody');
+      if (tbody && leadsRes.length > 0) {
+        const recent = leadsRes.slice(0, 5);
+        tbody.innerHTML = recent.map(l => {
+          const stageClass = { OPEN:'pill-open', CNR:'pill-cnr', CALLBACK:'pill-callback', STAGE2:'pill-s2', STAGE2_5:'pill-s2', ADMITTED:'pill-done' }[l.stage] || 'pill-open';
+          const stageLabel = { OPEN:'Open', CNR:'CNR', CALLBACK:'Call Back', STAGE2:'Stage 2', STAGE2_5:'Stage 2.5', ADMITTED:'Admitted' }[l.stage] || l.stage;
+          const srcClass = { META:'src-meta', GOOGLE:'src-google', INSTAGRAM:'src-insta', WALKIN:'src-walkin', INBOUND:'src-walkin' }[l.source] || 'src-meta';
+          const srcLabel = { META:'Meta', GOOGLE:'Google', INSTAGRAM:'Instagram', WALKIN:'Walk-in', INBOUND:'Inbound' }[l.source] || l.source;
+          return `<tr>
+            <td><strong>${l.firstName} ${l.lastName}</strong><br><span style="color:var(--muted); font-size:11px;">${l.email}</span></td>
+            <td>${l.countryCode || '+91'} ${l.phone}</td>
+            <td>${l.course}</td>
+            <td><span class="source-tag ${srcClass}">${srcLabel}</span></td>
+          <td><span class="stage-pill ${stageClass}">${stageLabel}</span></td>
+            <td>${l.assignedTo ? l.assignedTo.name : 'Unassigned'}</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="viewLead(${l.id})">View</button></td>
+          </tr>`;
+        }).join('');
+      }
+    } catch (e) {
+      console.log('Dashboard data fetch failed (backend may not be running):', e.message);
+    }
+  }
+
+  async function saveLead() {
+    const inputs = document.querySelectorAll('#leadModal input, #leadModal select');
+    const [firstName, lastName, phone, email, course, source, college, university, qualification, location, assignTo] = Array.from(inputs).map(i => i.value.trim());
+    if (!firstName || !phone || !email) { showToast('First name, phone and email are required', 'error'); return; }
+    const body = {
+      firstName, lastName, phone, email, course, source: enumSource(source),
+      college, university, qualification: enumQualification(qualification), location,
+      stage: 'OPEN', assignedTo: { id: 1, name: assignTo }
+    };
+    try {
+      await apiPost('/api/leads', body);
+      showToast('Lead saved successfully', 'success');
+      document.getElementById('leadModal').classList.remove('show');
+      loadDashboardData();
+    } catch (e) { showToast('Error saving lead', 'error'); }
+  }
+
+  async function viewLead(id) {
+    try {
+      const lead = await apiGet('/api/leads/' + id);
+      document.getElementById('viewFirstName').value = lead.firstName || '';
+      document.getElementById('viewLastName').value = lead.lastName || '';
+      document.getElementById('viewPhone').value = (lead.countryCode || '+91') + ' ' + (lead.phone || '');
+      document.getElementById('viewEmail').value = lead.email || '';
+      document.getElementById('viewCourse').value = lead.course || '';
+      document.getElementById('viewSource').value = srcLabel(lead.source);
+      document.getElementById('viewStage').value = stageLabel(lead.stage);
+      document.getElementById('viewAssigned').value = lead.assignedTo ? lead.assignedTo.name : 'Unassigned';
+      document.getElementById('viewCollege').value = lead.college || '';
+      document.getElementById('viewUniversity').value = lead.university || '';
+      document.getElementById('viewQualification').value = lead.qualification || '';
+      document.getElementById('viewLocation').value = lead.location || '';
+      document.getElementById('viewLeadModal').classList.add('show');
+    } catch (e) {
+      showToast('Failed to load lead: ' + e.message, 'error');
+    }
+  }
+
+  loadDashboardData();
+</script>
+<script src="frontend-qa.js"></script>
+</body>
+</html>

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM — Manage Users</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #4f8ef7;
+    --accent2: #6ee7b7;
+    --accent3: #f59e42;
+    --accent4: #f87171;
+    --accent5: #a78bfa;
+    --sidebar-w: 230px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .brand {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .role-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .nav-section {
+    padding: 16px 12px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 13.5px;
+    font-weight: 400;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); font-weight: 500; }
+
+  .nav-item .icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent5));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-info .name { font-weight: 500; font-size: 13px; }
+  .user-info .role { font-size: 11px; color: var(--muted); }
+
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #3d7de8; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .search-row input {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    width: 240px;
+    font-family: var(--font-body);
+  }
+
+  .search-row input:focus { border-color: var(--accent); }
+
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .user-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .user-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .user-table tr:last-child td { border-bottom: none; }
+  .user-table tbody tr { transition: background 0.12s; }
+  .user-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+  .user-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-cell .av {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-cell .uname { font-weight: 500; font-size: 13px; }
+  .user-cell .uemail { font-size: 11px; color: var(--muted); }
+
+  .role-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .role-admin { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .role-counselor { background: rgba(110,231,183,0.15); color: var(--accent2); }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  .status-active { background: var(--accent2); }
+  .status-inactive { background: var(--accent4); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color 0.18s;
+    cursor: default;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .stat-card:hover { border-color: var(--border2); }
+
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .value {
+    font-family: var(--font-head);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stat-card.total .value { color: var(--accent); }
+  .stat-card.active .value { color: var(--accent2); }
+  .stat-card.pending .value { color: var(--accent3); }
+  .stat-card.new .value { color: var(--accent5); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .stat-card:nth-child(2) { animation-delay: 0.10s; }
+  .stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 26px 28px;
+    width: 440px;
+    max-width: 95vw;
+    animation: fadeUp 0.2s ease;
+  }
+
+  .modal-title {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-row.full { grid-template-columns: 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-group label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-group input, .form-group select {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--bg3); }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">SahilCRM</div>
+    <span class="role-badge">Admin</span>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <a href="admin-dashboard.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a href="manage-users.html" class="nav-item active">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Manage Users
+    <span class="badge">5</span>
+  </a>
+  <a href="manage-lists.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+    Manage Lists
+  </a>
+  <a href="manage-leads.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    Manage Leads
+    <span class="badge">248</span>
+  </a>
+  <a href="courses.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    Courses
+  </a>
+
+  <div class="nav-section">Analytics</div>
+  <a href="reports.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Reports
+  </a>
+  <a href="follow-ups.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Follow-ups
+  </a>
+  <a href="call-records.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 012.08 4.18 2 2 0 014.06 2h3a2 2 0 012 1.72c.12.9.33 1.77.62 2.61a2 2 0 01-.45 2.11L8 9.67a16 16 0 006.33 6.33l1.23-1.23a2 2 0 012.11-.45c.84.29 1.71.5 2.61.62A2 2 0 0122 16.92z"/></svg>
+    Call Records
+  </a>
+  <a href="admissions.html" class="nav-item">
+    Admissions
+  </a>
+
+  <div class="nav-section">System</div>
+  <a href="settings.html" class="nav-item">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">SA</div>
+      <div class="user-info">
+        <div class="name">Super Admin</div>
+        <div class="role">admin@SahilCRM.in</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Manage Users</div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="document.getElementById('userModal').classList.add('show')">+ Add User</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="label">Total Users</div>
+        <div class="value">5</div>
+        <div class="sub">Across all roles</div>
+      </div>
+      <div class="stat-card active">
+        <div class="label">Active</div>
+        <div class="value">4</div>
+        <div class="sub">Currently working</div>
+      </div>
+      <div class="stat-card pending">
+        <div class="label">Pending</div>
+        <div class="value">1</div>
+        <div class="sub">Awaiting approval</div>
+      </div>
+      <div class="stat-card new">
+        <div class="label">New This Month</div>
+        <div class="value">2</div>
+        <div class="sub">+1 from last month</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-header">
+        <div class="section-title">All Users</div>
+        <div class="search-row">
+          <input type="text" placeholder="Search users..."/>
+          <button class="btn btn-outline">Filter</button>
+        </div>
+      </div>
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Leads Assigned</th>
+            <th>Conversions</th>
+            <th>Joined</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="userModal" onclick="if(event.target===this) this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Add New User</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" placeholder="First name"/>
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" placeholder="Last name"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="email@SahilCRM.in"/>
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" placeholder="+91 98765 43210"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Role</label>
+        <select>
+          <option value="COUNSELOR">Counselor</option>
+          <option value="MANAGER">Manager</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select>
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="userPassword" placeholder="Set temporary password"/>
+      </div>
+    </div>
+    <input type="hidden" id="editUserId"/>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('userModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="createUser()">Create User</button>
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+  async function loadUsers() {
+    try {
+      const [users, leads] = await Promise.all([
+        apiGet('/api/users').catch(() => []),
+        apiGet('/api/leads').catch(() => [])
+      ]);
+
+      const counselors = users.filter(u => u.role === 'COUNSELOR');
+      const active = counselors.filter(u => u.active !== false);
+      const pending = users.filter(u => u.active === false);
+
+      // Update stats
+      const statCards = document.querySelectorAll('.stats-grid .stat-card');
+      if (statCards[0]) statCards[0].querySelector('.value').textContent = users.length;
+      if (statCards[1]) statCards[1].querySelector('.value').textContent = active.length;
+      if (statCards[2]) statCards[2].querySelector('.value').textContent = pending.length;
+      if (statCards[3]) statCards[3].querySelector('.value').textContent = users.filter(u => {
+        const d = new Date(u.createdAt);
+        return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+      }).length;
+
+      // Load users table
+      const tbody = document.querySelector('.user-table tbody');
+      if (tbody && users.length > 0) {
+        tbody.innerHTML = users.map(u => {
+          const assignedLeads = leads.filter(l => l.assignedTo && l.assignedTo.id === u.id);
+          const converted = assignedLeads.filter(l => l.stage === 'ADMITTED').length;
+          const initials = (u.name || u.email).split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+          const isActive = u.active !== false;
+          return `<tr>
+            <td>
+              <div class="user-cell">
+                <div class="av" style="background: linear-gradient(135deg,var(--accent),var(--accent5))">${initials}</div>
+                <div><div class="uname">${u.name || u.email}</div><div class="uemail">${u.email}</div></div>
+              </div>
+            </td>
+            <td><span class="role-pill ${u.role === 'ADMIN' ? 'role-admin' : 'role-counselor'}">${u.role === 'ADMIN' ? 'Admin' : 'Counselor'}</span></td>
+            <td><span class="status-dot ${isActive ? 'status-active' : 'status-inactive'}"></span>${isActive ? 'Active' : 'Inactive'}</td>
+            <td>${assignedLeads.length}</td>
+            <td>${converted}</td>
+            <td>${fmtDate(u.createdAt)}</td>
+            <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="editUser(${u.id})">Edit</button></td>
+          </tr>`;
+        }).join('');
+      }
+    } catch (e) {
+      console.log('Users load failed:', e.message);
+    }
+  }
+
+  async function createUser() {
+    const modal = document.getElementById('userModal');
+    const firstName = modal.querySelector('input[placeholder*="First"]').value.trim();
+    const lastName = modal.querySelector('input[placeholder*="Last"]').value.trim();
+    const email = modal.querySelector('input[type="email"]').value.trim();
+    const phone = modal.querySelector('input[placeholder*="+91"]').value.trim();
+    const role = modal.querySelectorAll('select')[0].value;
+    const active = modal.querySelectorAll('select')[1].value === 'true';
+    const password = document.getElementById('userPassword').value.trim();
+    const editId = document.getElementById('editUserId').value;
+
+    if (!firstName || !lastName || !email) {
+      showToast('Please fill all required fields', 'error');
+      return;
+    }
+
+    const payload = {
+      name: firstName + ' ' + lastName,
+      email: email,
+      role: role,
+      active: active,
+      password: password || undefined
+    };
+
+    try {
+      if (editId) {
+        if (!password) {
+          const existingUser = await apiGet('/api/users/' + editId);
+          payload.password = existingUser.password;
+        }
+        await apiPut('/api/users/' + editId, payload);
+        showToast('User updated successfully!', 'success');
+      } else {
+        if (!password) {
+          showToast('Password is required for new users', 'error');
+          return;
+        }
+        await apiPost('/api/users', payload);
+        showToast('User created successfully!', 'success');
+      }
+      modal.classList.remove('show');
+      resetUserModal();
+      loadUsers();
+    } catch (e) {
+      showToast('Failed to save user: ' + e.message, 'error');
+    }
+  }
+
+  async function editUser(userId) {
+    try {
+      const user = await apiGet('/api/users/' + userId);
+      const modal = document.getElementById('userModal');
+      const names = (user.name || '').split(' ');
+      modal.querySelector('input[placeholder*="First"]').value = names[0] || '';
+      modal.querySelector('input[placeholder*="Last"]').value = names.slice(1).join(' ') || '';
+      modal.querySelector('input[type="email"]').value = user.email || '';
+      modal.querySelector('input[placeholder*="+91"]').value = user.phone || '';
+      modal.querySelectorAll('select')[0].value = user.role || 'COUNSELOR';
+      modal.querySelectorAll('select')[1].value = String(user.active !== false);
+      document.getElementById('userPassword').value = '';
+      document.getElementById('editUserId').value = userId;
+      modal.querySelector('.modal-title').textContent = 'Edit User';
+      modal.querySelector('.btn-primary').textContent = 'Update User';
+      modal.classList.add('show');
+    } catch (e) {
+      showToast('Failed to load user: ' + e.message, 'error');
+    }
+  }
+
+  function resetUserModal() {
+    const modal = document.getElementById('userModal');
+    modal.querySelectorAll('input').forEach(i => i.value = '');
+    modal.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    document.getElementById('editUserId').value = '';
+    modal.querySelector('.modal-title').textContent = 'Add New User';
+    modal.querySelector('.btn-primary').textContent = 'Create User';
+  }
+
+  loadUsers();
+</script>
+<script src="frontend-qa.js"></script>
+</body>
+</html>
+
