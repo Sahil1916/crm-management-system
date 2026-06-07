@@ -1,0 +1,12 @@
+target/
+*.class
+*.jar
+*.war
+.env
+*.env.local
+application-prod.properties
+application-local.properties
+.idea/
+*.iml
+.DS_Store
+logs/
