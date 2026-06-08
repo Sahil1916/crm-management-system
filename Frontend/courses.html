@@ -499,7 +499,8 @@
         </div>
         <div class="course-actions">
           <button class="btn btn-outline" style="font-size:11px;" onclick="openCourseEditor('MBA')">Edit</button>
-          <button class="btn btn-primary" style="font-size:11px;" onclick="showCourseDetails('MBA')">Details</button>
+          <button class="btn btn-outline" style="font-size:11px;color:var(--accent2);" onclick="toggleCourseStatus('MBA')">Status</button>
+          <button class="btn btn-outline" style="font-size:11px;color:var(--accent4);" onclick="deleteCourse('MBA')">Delete</button>
         </div>
       </div>
 
@@ -516,7 +517,8 @@
         </div>
         <div class="course-actions">
           <button class="btn btn-outline" style="font-size:11px;" onclick="openCourseEditor('MCA')">Edit</button>
-          <button class="btn btn-primary" style="font-size:11px;" onclick="showCourseDetails('MCA')">Details</button>
+          <button class="btn btn-outline" style="font-size:11px;color:var(--accent2);" onclick="toggleCourseStatus('MCA')">Status</button>
+          <button class="btn btn-outline" style="font-size:11px;color:var(--accent4);" onclick="deleteCourse('MCA')">Delete</button>
         </div>
       </div>
 
@@ -533,7 +535,8 @@
         </div>
         <div class="course-actions">
           <button class="btn btn-outline" style="font-size:11px;" onclick="openCourseEditor('BBA')">Edit</button>
-          <button class="btn btn-primary" style="font-size:11px;" onclick="showCourseDetails('BBA')">Details</button>
+          <button class="btn btn-outline" style="font-size:11px;color:var(--accent2);" onclick="toggleCourseStatus('BBA')">Status</button>
+          <button class="btn btn-outline" style="font-size:11px;color:var(--accent4);" onclick="deleteCourse('BBA')">Delete</button>
         </div>
       </div>
 
@@ -550,7 +553,8 @@
         </div>
         <div class="course-actions">
           <button class="btn btn-outline" style="font-size:11px;" onclick="openCourseEditor('BCA')">Edit</button>
-          <button class="btn btn-primary" style="font-size:11px;" onclick="showCourseDetails('BCA')">Details</button>
+          <button class="btn btn-outline" style="font-size:11px;color:var(--accent2);" onclick="toggleCourseStatus('BCA')">Status</button>
+          <button class="btn btn-outline" style="font-size:11px;color:var(--accent4);" onclick="deleteCourse('BCA')">Delete</button>
         </div>
       </div>
     </div>
@@ -807,7 +811,9 @@
           const courseLeads = leads.filter(l => l.course === c.code).length;
           const colors = ['#4f8ef7','#6ee7b7','#f59e42','#a78bfa'];
           const color = colors[i % colors.length];
-          return `<div class="course-card">
+          const statusColor = c.status === 'ACTIVE' ? 'var(--accent2)' : 'var(--accent4)';
+          const statusLabel = c.status === 'ACTIVE' ? 'Deactivate' : 'Activate';
+          return `<div class="course-card" id="card-${c.id}">
             <div class="course-icon" style="background: linear-gradient(135deg, ${color}33, ${color}14);">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M12 17v4M8 21h8"/></svg>
             </div>
@@ -818,9 +824,10 @@
               <span><strong>${c.totalSeats}</strong> seats</span>
               <span><strong>${courseLeads}</strong> leads</span>
             </div>
-            <div class="course-actions">
+            <div class="course-actions" style="flex-wrap:wrap;">
               <button class="btn btn-outline" style="font-size:11px;" onclick="openCourseEditor('${c.code}')">Edit</button>
-              <button class="btn btn-primary" style="font-size:11px;" onclick="showCourseDetails('${c.code}')">Details</button>
+              <button class="btn btn-outline" style="font-size:11px;color:${statusColor};" onclick="toggleCourseStatus('${c.code}')">${statusLabel}</button>
+              <button class="btn btn-outline" style="font-size:11px;color:var(--accent4);" onclick="deleteCourse('${c.code}')">Delete</button>
             </div>
           </div>`;
         }).join('');
@@ -848,6 +855,32 @@
       }
     } catch (e) {
       console.log('Courses fetch failed:', e.message);
+    }
+  }
+
+  async function deleteCourse(code) {
+    const course = courseCache.find(c => c.code === code);
+    if (!course || !course.id) { showToast('Course not found in database', 'error'); return; }
+    if (!confirm(`Delete course "${code}"? This cannot be undone.`)) return;
+    try {
+      await apiDelete('/api/courses/' + course.id);
+      showToast(code + ' deleted successfully', 'success');
+      loadCourses();
+    } catch (e) {
+      showToast('Delete failed: ' + e.message, 'error');
+    }
+  }
+
+  async function toggleCourseStatus(code) {
+    const course = courseCache.find(c => c.code === code);
+    if (!course || !course.id) { showToast('Course not found in database', 'error'); return; }
+    const newStatus = course.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    try {
+      await apiPut('/api/courses/' + course.id, { ...course, status: newStatus });
+      showToast(code + ' marked as ' + newStatus, 'success');
+      loadCourses();
+    } catch (e) {
+      showToast('Status update failed: ' + e.message, 'error');
     }
   }
 

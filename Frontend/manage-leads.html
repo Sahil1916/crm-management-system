@@ -594,6 +594,8 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="document.getElementById('viewLeadModal').classList.remove('show')">Close</button>
+      <button class="btn btn-outline" style="color:var(--accent);" onclick="openChangeStage()">Change Stage</button>
+      <button class="btn btn-outline" style="color:var(--accent4);" onclick="deleteCurrentLead()">Delete</button>
     </div>
   </div>
 </div>
@@ -775,9 +777,14 @@
 
   loadLeads();
 
+  let currentLeadId = null;
+  let currentLeadData = null;
+
   async function viewLead(id) {
     try {
       const lead = await apiGet('/api/leads/' + id);
+      currentLeadId = id;
+      currentLeadData = lead;
       document.getElementById('viewFirstName').value = lead.firstName || '';
       document.getElementById('viewLastName').value = lead.lastName || '';
       document.getElementById('viewPhone').value = (lead.countryCode || '+91') + ' ' + (lead.phone || '');
@@ -793,6 +800,39 @@
       document.getElementById('viewLeadModal').classList.add('show');
     } catch (e) {
       showToast('Failed to load lead: ' + e.message, 'error');
+    }
+  }
+
+  async function deleteCurrentLead() {
+    if (!currentLeadId) return;
+    if (!confirm('Delete this lead? This cannot be undone.')) return;
+    try {
+      await apiDelete('/api/leads/' + currentLeadId);
+      document.getElementById('viewLeadModal').classList.remove('show');
+      showToast('Lead deleted', 'success');
+      loadLeads();
+    } catch (e) {
+      showToast('Delete failed: ' + e.message, 'error');
+    }
+  }
+
+  async function openChangeStage() {
+    if (!currentLeadId || !currentLeadData) return;
+    const stages = ['OPEN','CNR','CALLBACK','STAGE2','STAGE2_5','ADMITTED'];
+    const labels = {'OPEN':'Open','CNR':'CNR','CALLBACK':'Callback','STAGE2':'Stage 2','STAGE2_5':'Stage 2.5','ADMITTED':'Admitted'};
+    const options = stages.map(s => `<option value="${s}" ${currentLeadData.stage===s?'selected':''}>${labels[s]}</option>`).join('');
+    const newStage = prompt('Change stage to:\n' + stages.map(s=>labels[s]).join(', ') + '\n\nCurrent: ' + (labels[currentLeadData.stage]||currentLeadData.stage));
+    if (!newStage) return;
+    const matched = stages.find(s => s === newStage.toUpperCase() || labels[s].toLowerCase() === newStage.toLowerCase());
+    if (!matched) { showToast('Invalid stage entered', 'error'); return; }
+    try {
+      await apiPut('/api/leads/' + currentLeadId, { ...currentLeadData, stage: matched, assignedTo: currentLeadData.assignedTo ? { id: currentLeadData.assignedTo.id } : null });
+      showToast('Stage updated to ' + labels[matched], 'success');
+      document.getElementById('viewStage').value = labels[matched];
+      currentLeadData.stage = matched;
+      loadLeads();
+    } catch (e) {
+      showToast('Stage update failed: ' + e.message, 'error');
     }
   }
 

@@ -16,7 +16,18 @@
   .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}.topbar{height:60px;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0}.topbar-title{font-family:var(--font-head);font-size:17px;font-weight:600}.topbar-right{display:flex;gap:12px}.btn{border:0;border-radius:8px;padding:8px 13px;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer}.btn-primary{background:linear-gradient(135deg,var(--accent),#2f6fe6);color:#fff}.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}.btn-danger{background:rgba(248,113,113,.14);color:var(--accent4)}
   .content{padding:28px}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px}.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px}.label{color:var(--muted);font-size:12px;margin-bottom:8px}.value{font-family:var(--font-head);font-size:28px;font-weight:700;color:var(--accent)}
   .toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:16px}.search,input,select,textarea{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 12px;font-family:var(--font-body);outline:0}.search{width:320px}.panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}table{width:100%;border-collapse:collapse}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px;text-align:left;padding:13px 14px;border-bottom:1px solid var(--border)}td{padding:13px 14px;border-bottom:1px solid var(--border)}tr:last-child td{border-bottom:0}.pill{display:inline-flex;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:600}.paid{background:rgba(110,231,183,.14);color:var(--accent2)}.partial{background:rgba(245,158,66,.14);color:var(--accent3)}.pending{background:rgba(248,113,113,.14);color:var(--accent4)}
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;z-index:500}.modal-overlay.show{display:flex}.modal{width:560px;max-width:calc(100vw - 32px);background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px}.modal-title{font-family:var(--font-head);font-size:18px;margin-bottom:16px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.form-row.full{grid-template-columns:1fr}.form-group label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}.empty{text-align:center;color:var(--muted);padding:32px}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;z-index:500}
+  .modal-overlay.show{display:flex}
+  .modal{width:560px;max-width:calc(100vw - 32px);background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;max-height:90vh;overflow-y:auto}
+  .modal-title{font-family:var(--font-head);font-size:18px;margin-bottom:20px;color:var(--text)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .form-row.full{grid-template-columns:1fr}
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-group label{color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+  .form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-family:var(--font-body);font-size:13px;outline:none}
+  .form-group select{cursor:pointer}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+  .empty{text-align:center;color:var(--muted);padding:32px}
 </style>
 </head>
 <body>
@@ -37,11 +48,55 @@
 <div class="modal-overlay" id="admissionModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal">
     <div class="modal-title">Convert Enquiry to Admission</div>
-    <div class="form-row full"><div class="form-group"><label>Lead</label><select id="leadSelect"></select></div></div>
-    <div class="form-row"><div class="form-group"><label>Course</label><select id="courseSelect"></select></div><div class="form-group"><label>Admission Date</label><input id="admissionDate" type="date"/></div></div>
-    <div class="form-row"><div class="form-group"><label>Total Fees</label><input id="totalFees" type="number" placeholder="75000"/></div><div class="form-group"><label>Fees Paid</label><input id="feesPaid" type="number" placeholder="25000"/></div></div>
-    <div class="form-row"><div class="form-group"><label>Payment Status</label><select id="paymentStatus"><option value="PENDING">Pending</option><option value="PARTIAL">Partial</option><option value="PAID">Paid</option></select></div><div class="form-group"><label>Remarks</label><input id="admissionRemarks" placeholder="Payment type / installment notes"/></div></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="document.getElementById('admissionModal').classList.remove('show')">Cancel</button><button class="btn btn-primary" onclick="saveAdmission()">Save Admission</button></div>
+
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Select Lead</label>
+        <select id="leadSelect"></select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Course</label>
+        <select id="courseSelect"></select>
+      </div>
+      <div class="form-group">
+        <label>Admission Date</label>
+        <input id="admissionDate" type="date"/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Total Fees (₹)</label>
+        <input id="totalFees" type="number" placeholder="e.g. 75000"/>
+      </div>
+      <div class="form-group">
+        <label>Fees Paid (₹)</label>
+        <input id="feesPaid" type="number" placeholder="e.g. 25000"/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Payment Status</label>
+        <select id="paymentStatus">
+          <option value="PENDING">Pending</option>
+          <option value="PARTIAL">Partial</option>
+          <option value="PAID">Paid</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Remarks</label>
+        <input id="admissionRemarks" placeholder="Payment type / installment notes"/>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('admissionModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAdmission()">Save Admission</button>
+    </div>
   </div>
 </div>
 
