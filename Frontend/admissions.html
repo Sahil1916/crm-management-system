@@ -131,10 +131,10 @@ function renderAdmissions(){
   document.getElementById('paidCount').textContent = admissions.filter(a=>a.paymentStatus==='PAID').length;
   const tbody = document.querySelector('.admission-table tbody');
   if(!admissions.length){tbody.innerHTML='<tr><td colspan="7" class="empty">No admissions yet. Convert an admitted lead.</td></tr>';return}
-  tbody.innerHTML = admissions.map(a=>`<tr><td><strong>${a.lead?.firstName||''} ${a.lead?.lastName||''}</strong><br><span style="color:var(--muted);font-size:11px">${a.lead?.email||''}</span></td><td>${a.course?.code||a.lead?.course||'-'}</td><td>${a.counselor?.name||'Unassigned'}</td><td>₹${Number(a.totalFees||0).toLocaleString('en-IN')}</td><td>₹${Number(a.feesPaid||0).toLocaleString('en-IN')}</td><td><span class="pill ${String(a.paymentStatus||'PENDING').toLowerCase()}">${a.paymentStatus||'PENDING'}</span></td><td>${fmtDate(a.admissionDate)}</td></tr>`).join('');
+  tbody.innerHTML = admissions.map(a=>`<tr><td><strong>${a.lead?.firstName||''} ${a.lead?.lastName||''}</strong><br><span style="color:var(--muted);font-size:11px">${a.lead?.email||''}</span></td><td>${a.course?.code||a.lead?.course||'-'}</td><td>${a.counselor?.name||'Unassigned'}</td><td>₹${Number(a.totalFees||0).toLocaleString('en-IN')}</td><td>₹${Number(a.feesPaid||0).toLocaleString('en-IN')}</td><td><span class="pill ${String(a.paymentStatus||'PENDING').toLowerCase()}">${a.paymentStatus||'PENDING'}</span></td><td>${formatDateTime(a.updatedAt || a.createdAt || a.admissionDate)}</td></tr>`).join('');
 }
 function openAdmissionModal(){
-  document.getElementById('admissionDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('admissionDate').value = localDateKey(new Date());
   document.getElementById('leadSelect').innerHTML = leads.map(l=>`<option value="${l.id}">${l.firstName} ${l.lastName} — ${l.course}</option>`).join('');
   document.getElementById('courseSelect').innerHTML = courses.map(c=>`<option value="${c.id}" data-fees="${c.fees||0}">${c.code} — ${c.name}</option>`).join('');
   document.getElementById('admissionModal').classList.add('show');

@@ -217,6 +217,11 @@
   .form-group {
     margin-bottom: 16px;
   }
+  .toggle-pw:hover #eye-icon{
+    stroke:#007bff;
+    transform:scale(1.1);
+    transition:.2s;
+}
 
   .form-group label {
     display: block;
@@ -264,8 +269,8 @@
 
   .toggle-pw {
     position: absolute;
-    right: 13px;
-    top: 50%;
+    right: 90px; 
+    top: 63%;
     transform: translateY(-50%);
     cursor: pointer;
     color: var(--muted);
@@ -353,6 +358,47 @@
     animation: spin 0.7s linear infinite;
   }
 
+  .input-wrap{
+    position:relative;
+    width:320px;
+}
+
+input{
+    width:100%;
+    padding:14px 45px 14px 14px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    font-size:16px;
+}
+
+.toggle-pw{
+    position:absolute;
+    right: 90px;
+    top:62.5%;
+    transform:translateY(-50%);
+    border:none;
+    background:none;
+    cursor:pointer;
+    padding:0;
+}
+
+#eye-icon{
+    width:22px;
+    height:22px;
+    stroke:#666;
+    stroke-width:2;
+    fill:none;
+}
+
+#slash{
+    opacity:0;
+    transition:.25s ease;
+}
+
+.toggle-pw.show #slash{
+    opacity:1;
+}
+
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .alert-box {
@@ -401,45 +447,6 @@
     font-size: 12px;
     color: var(--muted);
   }
-
-  .demo-pills {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .demo-pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg2);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-size: 12.5px;
-  }
-
-  .demo-pill:hover { border-color: var(--border2); background: var(--bg3); }
-
-  .demo-pill .dp-role {
-    font-weight: 600;
-    min-width: 68px;
-  }
-
-  .demo-pill .dp-cred { color: var(--muted); font-size: 11.5px; }
-
-  .demo-pill .dp-badge {
-    margin-left: auto;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 600;
-  }
-
-  .badge-admin { background: rgba(79,142,247,0.15); color: var(--accent); }
-  .badge-counselor { background: rgba(110,231,183,0.12); color: var(--accent2); }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(12px); }
@@ -490,15 +497,15 @@
 
   <div class="stats-row">
     <div class="stat-mini">
-      <div class="num">248</div>
+      <div class="num">0</div>
       <div class="lbl">Total Leads</div>
     </div>
     <div class="stat-mini">
-      <div class="num">18</div>
+      <div class="num">0</div>
       <div class="lbl">Admissions</div>
     </div>
     <div class="stat-mini">
-      <div class="num">5</div>
+      <div class="num">0</div>
       <div class="lbl">Counselors</div>
     </div>
   </div>
@@ -541,17 +548,36 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label>Password</label>
-      <div class="input-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password"/>
-        <button class="toggle-pw" onclick="togglePw()" type="button">
-          <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      </div>
-    </div>
+   <div class="form-group">
+    <label>Password</label>
 
+    <div class="input-wrap">
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+        >
+    </div>
+    <button type="button" class="toggle-pw" onclick="togglePw()">
+            <svg id="eye-icon" viewBox="0 0 24 24">
+                <path
+                    d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z">
+                </path>
+
+                <circle cx="12" cy="12" r="3"></circle>
+
+                <line id="slash"
+                      x1="4"
+                      y1="4"
+                      x2="20"
+                      y2="20">
+                </line>
+            </svg>
+        </button>
+
+   
+</div>
+ 
     <div class="remember-row">
       <label><input type="checkbox" id="remember"/> Remember me</label>
       <a class="forgot-link" href="#">Forgot password?</a>
@@ -561,39 +587,6 @@
       <div class="spinner" id="spinner"></div>
       <span id="loginBtnText">Sign In</span>
     </button>
-
-    <div class="divider">or try a demo account</div>
-
-    <div class="demo-pills">
-      <div class="demo-pill" onclick="fillDemo('admin', 'admin@sahilcrm.in', 'admin123')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        <div>
-          <div class="dp-role" style="color:var(--accent)">Admin</div>
-          <div class="dp-cred">admin@sahilcrm.in / admin123</div>
-        </div>
-        <span class="dp-badge badge-admin">Fill</span>
-      </div>
-      <div class="demo-pill" onclick="fillDemo('manager', 'manager@sahilcrm.in', 'manager123')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e42" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a4 4 0 00-8 0v16"/></svg>
-        <div>
-          <div class="dp-role" style="color:var(--accent3)">Manager</div>
-          <div class="dp-cred">manager@sahilcrm.in / manager123</div>
-        </div>
-        <span class="dp-badge badge-admin" style="background:rgba(245,158,66,0.15);color:var(--accent3)">Fill</span>
-      </div>
-      <div class="demo-pill" onclick="fillDemo('counselor', 'rahul@sahilcrm.in', 'rahul123')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        <div>
-          <div class="dp-role" style="color:var(--accent2)">Counselor</div>
-          <div class="dp-cred">rahul@sahilcrm.in / rahul123</div>
-        </div>
-        <span class="dp-badge badge-counselor">Fill</span>
-      </div>
-    </div>
-
-    <div class="footer-note">
-      SahilCRM v1.0 &nbsp;·&nbsp; Internal Use Only
-    </div>
   </div>
 </div>
 
@@ -608,17 +601,12 @@
     document.getElementById('tab-counselor').classList.toggle('selected', role === 'counselor');
     clearAlert();
   }
+ 
+  
 
   function togglePw() {
     const inp = document.getElementById('password');
     inp.type = inp.type === 'password' ? 'text' : 'password';
-  }
-
-  function fillDemo(role, user, pass) {
-    selectRole(role);
-    document.getElementById('username').value = user;
-    document.getElementById('password').value = pass;
-    clearAlert();
   }
 
   function showAlert(msg, type) {
@@ -680,7 +668,9 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter') handleLogin();
   });
+  
 </script>
-<script src="frontend-qa.js"></script>
+<script src="frontend-qa.js"></script>
+
 </body>
 </html>

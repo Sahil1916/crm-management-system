@@ -154,3 +154,33 @@ const Admissions = {
   update: (id, a) => apiPut(`/api/admissions/${id}`, a),
   delete: (id) => apiDelete(`/api/admissions/${id}`)
 };
+
+// Shared call handler: mobile dials directly, desktop shows a popup with name+number
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function initiateCall(name, phone) {
+  if (!phone) { if (window.showToast) showToast('No phone number available', 'error'); return; }
+  if (isMobileDevice()) {
+    location.href = 'tel:' + phone;
+    return;
+  }
+  let modal = document.getElementById('callInfoModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'callInfoModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:999;';
+    modal.innerHTML = `
+      <div style="background:var(--bg2,#171b26);border:1px solid var(--border,rgba(255,255,255,.1));border-radius:14px;padding:24px;width:320px;text-align:center;font-family:'DM Sans',sans-serif;">
+        <div style="font-size:13px;color:var(--muted,#7a8099);margin-bottom:6px;">Call this number manually</div>
+        <div id="callInfoName" style="font-size:16px;font-weight:600;color:var(--text,#e8eaf0);margin-bottom:4px;"></div>
+        <div id="callInfoPhone" style="font-size:20px;font-weight:700;color:var(--accent,#4f8ef7);margin-bottom:18px;letter-spacing:.5px;"></div>
+        <button onclick="document.getElementById('callInfoModal').remove()" style="padding:8px 20px;border-radius:8px;border:1px solid var(--border,rgba(255,255,255,.12));background:transparent;color:var(--text,#e8eaf0);cursor:pointer;font-size:13px;">Close</button>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+  document.getElementById('callInfoName').textContent = name || 'Lead';
+  document.getElementById('callInfoPhone').textContent = phone;
+  modal.style.display = 'flex';
+}

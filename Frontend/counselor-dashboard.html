@@ -199,27 +199,8 @@
           <div class="section-title">Upcoming Follow-ups</div>
           <a href="counselor-followups.html" class="btn btn-outline" style="font-size:11px; padding:5px 11px; text-decoration:none;">View All</a>
         </div>
-        <div class="upcoming-list">
-          <div class="upcoming-row">
-            <div class="time-block"><div class="day">26</div><div class="month">Apr</div></div>
-            <div class="info"><div class="uname">Neha Joshi</div><div class="udetail">MCA — Stage 2.5 · 10:30 AM</div></div>
-            <button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="location.href='tel:+918765432109'">Call</button>
-          </div>
-          <div class="upcoming-row">
-            <div class="time-block"><div class="day">26</div><div class="month">Apr</div></div>
-            <div class="info"><div class="uname">Sana Shaikh</div><div class="udetail">MCA — Open · 2:00 PM</div></div>
-            <button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="location.href='tel:+915432109876'">Call</button>
-          </div>
-          <div class="upcoming-row">
-            <div class="time-block"><div class="day">27</div><div class="month">Apr</div></div>
-            <div class="info"><div class="uname">Karan Malhotra</div><div class="udetail">MBA — Callback · 11:00 AM</div></div>
-            <button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="location.href='tel:+919988776655'">Call</button>
-          </div>
-          <div class="upcoming-row">
-            <div class="time-block"><div class="day">28</div><div class="month">Apr</div></div>
-            <div class="info"><div class="uname">Divya Nair</div><div class="udetail">BBA — Stage 2 · 4:00 PM</div></div>
-            <button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="location.href='tel:+918877665544'">Call</button>
-          </div>
+        <div class="upcoming-list" id="upcomingFollowUps">
+          <div style="color:var(--muted);font-size:13px;padding:8px;">Loading...</div>
         </div>
       </div>
 
@@ -436,7 +417,43 @@ async function loadDashboardData() {
   }
 }
 
+async function loadUpcomingFollowUps() {
+  const container = document.getElementById('upcomingFollowUps');
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const counselorId = user.id || 3;
+    const followUps = await apiGet('/api/followups/counselor/' + counselorId).catch(() => []);
+    const upcoming = followUps
+      .filter(f => f.status === 'SCHEDULED')
+      .sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate))
+      .slice(0, 4);
+
+    if (!upcoming.length) {
+      container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px;">No upcoming follow-ups.</div>';
+      return;
+    }
+
+    container.innerHTML = upcoming.map(f => {
+      const lead = f.lead || {};
+      const d = new Date(f.scheduledDate);
+      const day = d.getDate();
+      const month = d.toLocaleDateString('en-US', { month: 'short' });
+      const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      const name = ((lead.firstName || '') + ' ' + (lead.lastName || '')).trim() || 'Lead';
+      const phone = (lead.countryCode || '+91') + (lead.phone || '');
+      return `<div class="upcoming-row">
+        <div class="time-block"><div class="day">${day}</div><div class="month">${month}</div></div>
+        <div class="info"><div class="uname">${name}</div><div class="udetail">${lead.course || ''} — ${f.notes || ''} · ${time}</div></div>
+        <button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="initiateCall('${name.replace(/'/g, "\\'")}', '${phone}')">Call</button>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px;">Failed to load follow-ups.</div>';
+  }
+}
+
 loadDashboardData();
+loadUpcomingFollowUps();
 </script>
 
 <script src="frontend-qa.js"></script>

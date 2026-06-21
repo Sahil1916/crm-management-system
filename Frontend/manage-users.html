@@ -630,8 +630,9 @@
       if (statCards[1]) statCards[1].querySelector('.value').textContent = active.length;
       if (statCards[2]) statCards[2].querySelector('.value').textContent = pending.length;
       if (statCards[3]) statCards[3].querySelector('.value').textContent = users.filter(u => {
-        const d = new Date(u.createdAt);
-        return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+        const d = parseAppDate(u.createdAt);
+        const now = new Date();
+        return d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
       }).length;
 
       // Load users table
@@ -653,7 +654,7 @@
             <td><span class="status-dot ${isActive ? 'status-active' : 'status-inactive'}"></span>${isActive ? 'Active' : 'Inactive'}</td>
             <td>${assignedLeads.length}</td>
             <td>${converted}</td>
-            <td>${fmtDate(u.createdAt)}</td>
+            <td>${formatDateTime(u.updatedAt || u.createdAt)}</td>
             <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="editUser(${u.id})">Edit</button></td>
           </tr>`;
         }).join('');
@@ -743,7 +744,8 @@
 
   loadUsers();
 </script>
-<script src="frontend-qa.js"></script>
+<script src="frontend-qa.js"></script>
+
 </body>
 </html>
 

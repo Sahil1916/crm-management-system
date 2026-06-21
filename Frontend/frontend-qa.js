@@ -208,28 +208,9 @@
   function enhanceManageLeadsImport() {
     if (!location.pathname.endsWith('manage-leads.html')) return;
     const importButton = qsa('#importModal .btn-primary').pop();
-    if (importButton) importButton.onclick = importSampleLead;
+    if (importButton) importButton.onclick = () => toast('Please upload a real CSV file.', 'info');
   }
 
-  async function importSampleLead() {
-    try {
-      await post('/api/leads', {
-        firstName: 'Imported',
-        lastName: 'Lead',
-        email: 'imported.' + Date.now() + '@example.com',
-        phone: '9999999999',
-        countryCode: '+91',
-        course: 'MBA',
-        source: 'META',
-        stage: 'OPEN'
-      });
-      qs('#importModal').classList.remove('show');
-      toast('Sample CSV lead imported. Real file parsing can be added next.', 'success');
-      if (window.loadLeads) loadLeads();
-    } catch (error) {
-      toast('Import failed: ' + error.message, 'error');
-    }
-  }
 
   function enhanceAdmissionsLinks() {
     const hasAdmissionLink = !!qs('a[href="admissions.html"]');

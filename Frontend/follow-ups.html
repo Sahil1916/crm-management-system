@@ -249,7 +249,7 @@ function renderFollowUps() {
           </div>
         </div>
       </td>
-      <td>${formatDate(f.scheduledDate)}</td>
+      <td>${formatDateTime(f.updatedAt || f.createdAt || f.scheduledDate)}</td>
       <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
       <td>${counselor.name || 'Unassigned'}</td>
       <td style="max-width:180px;color:var(--muted);font-size:12px">${f.notes || '-'}</td>
@@ -271,20 +271,6 @@ function filterFollowUps(query) {
   });
 }
 
-function formatDate(value) {
-  if (!value) return '-';
-  const d = new Date(value);
-  if (isNaN(d)) return '-';
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const tomorrowStart = new Date(todayStart.getTime() + 86400000);
-  const yesterdayStart = new Date(todayStart.getTime() - 86400000);
-  const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  if (d >= todayStart && d < tomorrowStart) return `Today, ${time}`;
-  if (d >= yesterdayStart && d < todayStart) return `Yesterday, ${time}`;
-  if (d >= tomorrowStart && d < new Date(tomorrowStart.getTime() + 86400000)) return `Tomorrow, ${time}`;
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + time;
-}
 
 async function markDone(id) {
   const fu = allFollowUps.find(f => f.id === id);

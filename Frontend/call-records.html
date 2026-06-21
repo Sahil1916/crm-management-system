@@ -128,9 +128,10 @@
             <th>Duration</th>
             <th>Next Follow-up</th>
             <th>Remarks</th>
+            <th>Recording</th>
           </tr>
         </thead>
-        <tbody><tr><td colspan="7" class="empty">Loading call records...</td></tr></tbody>
+        <tbody><tr><td colspan="8" class="empty">Loading call records...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -163,6 +164,10 @@
       <div class="form-group">
         <label>Notes / Description</label>
         <textarea id="callNotes" rows="4" placeholder="What was discussed? Any follow-up needed?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Call Recording (optional)</label>
+        <input type="url" id="callRecordingUrl" placeholder="Paste recording link"/>
       </div>
     </div>
     <div class="modal-actions">
@@ -248,7 +253,7 @@
 
     const tbody = document.querySelector('.call-table tbody');
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty">No call records found.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="empty">No call records found.</td></tr>';
       return;
     }
     tbody.innerHTML = rows.map(record => {
@@ -257,11 +262,12 @@
       return `<tr>
         <td><strong>${lead.firstName || ''} ${lead.lastName || ''}</strong><br><span style="color:var(--muted);font-size:11px;">${lead.phone || ''}</span></td>
         <td>${counselor.name || 'Unassigned'}</td>
-        <td>${formatDateTime(record.callDate)}</td>
+        <td>${formatDateTime(record.updatedAt || record.createdAt || record.callDate)}</td>
         <td><span class="status-pill ${statusClass(record.callStatus)}">${statusLabel(record.callStatus)}</span></td>
         <td>${record.durationMinutes ? record.durationMinutes + ' min' : '-'}</td>
         <td>${record.nextFollowUpDate ? formatDateTime(record.nextFollowUpDate) : '-'}</td>
         <td>${record.remarks || '-'}</td>
+        <td>${record.recordingUrl ? `<a href="${record.recordingUrl}" target="_blank" rel="noopener" style="color:var(--accent);">Recording</a>` : '-'}</td>
       </tr>`;
     }).join('');
     filterTable('.call-table', document.getElementById('callSearch').value);
@@ -282,12 +288,6 @@
     return 'neutral';
   }
 
-  function formatDateTime(value) {
-    if (!value) return '-';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '-';
-    return date.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
-  }
 
   if (initShell()) loadCallRecords();
 
@@ -296,6 +296,7 @@
     document.getElementById('callStatus').value = 'CONNECTED';
     document.getElementById('callDuration').value = '';
     document.getElementById('callNotes').value = '';
+    document.getElementById('callRecordingUrl').value = '';
     document.getElementById('logCallModal').classList.add('show');
   }
 
@@ -304,6 +305,7 @@
     const status = document.getElementById('callStatus').value;
     const duration = document.getElementById('callDuration').value;
     const notes = document.getElementById('callNotes').value.trim();
+    const recordingUrl = document.getElementById('callRecordingUrl').value.trim();
 
     if (!leadId) { showToast('Lead ID is required', 'error'); return; }
 
@@ -314,7 +316,8 @@
         counselor: user ? { id: user.id } : null,
         callStatus: status,
         durationMinutes: duration ? parseInt(duration) : 0,
-        remarks: notes
+        remarks: notes,
+        recordingUrl: recordingUrl || null
       });
       showToast('Call logged successfully', 'success');
       document.getElementById('logCallModal').classList.remove('show');

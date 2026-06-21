@@ -594,47 +594,8 @@
           <div class="section-title">Today's Schedule</div>
           <button class="btn btn-outline" style="font-size:11px; padding:5px 11px;">View All</button>
         </div>
-        <div class="followup-list">
-          <div class="followup-row">
-            <div class="time">10:30</div>
-            <div class="info">
-              <div class="fname">Neha Joshi — MCA</div>
-              <div class="fdetail"><span class="status-dot dot-pending"></span>Stage 2.5 · Follow-up call</div>
-            </div>
-            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Call</button>
-          </div>
-          <div class="followup-row">
-            <div class="time">12:00</div>
-            <div class="info">
-              <div class="fname">Sana Shaikh — MCA</div>
-              <div class="fdetail"><span class="status-dot dot-done"></span>Open · First contact</div>
-            </div>
-            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Done</button>
-          </div>
-          <div class="followup-row">
-            <div class="time">14:00</div>
-            <div class="info">
-              <div class="fname">Karan Malhotra — MBA</div>
-              <div class="fdetail"><span class="status-dot dot-pending"></span>Call Back · Fee discussion</div>
-            </div>
-            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Call</button>
-          </div>
-          <div class="followup-row">
-            <div class="time">16:30</div>
-            <div class="info">
-              <div class="fname">Divya Nair — BBA</div>
-              <div class="fdetail"><span class="status-dot dot-overdue"></span>Stage 2 · Overdue by 1 day</div>
-            </div>
-            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Call</button>
-          </div>
-          <div class="followup-row">
-            <div class="time">17:00</div>
-            <div class="info">
-              <div class="fname">Rohit Sen — BCA</div>
-              <div class="fdetail"><span class="status-dot dot-pending"></span>CNR · 3rd attempt</div>
-            </div>
-            <button class="btn btn-outline" style="font-size:10px; padding:4px 9px;">Call</button>
-          </div>
+        <div class="followup-list" id="todayScheduleList">
+          <div style="color:var(--muted);font-size:13px;padding:8px;">Loading...</div>
         </div>
       </div>
     </div>
@@ -657,42 +618,8 @@
             <th style="text-align:left; padding:8px 10px; color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border);">Action</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>Neha Joshi</strong><br><span style="color:var(--muted); font-size:11px;">+91 87654 32109</span></td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Apr 25, 10:30 AM</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Follow-up call</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot dot-pending"></span>Pending</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
-          </tr>
-          <tr>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>Karan Malhotra</strong><br><span style="color:var(--muted); font-size:11px;">+91 99887 76655</span></td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Apr 25, 2:00 PM</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Fee discussion</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot dot-pending"></span>Pending</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
-          </tr>
-          <tr>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>Divya Nair</strong><br><span style="color:var(--muted); font-size:11px;">+91 88776 65544</span></td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Apr 24, 4:00 PM</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Stage update</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot dot-overdue"></span>Overdue</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
-          </tr>
-          <tr>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>Rohit Sen</strong><br><span style="color:var(--muted); font-size:11px;">+91 77665 54433</span></td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Apr 25, 5:00 PM</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);">Retry call</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot dot-pending"></span>Pending</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
-          </tr>
-          <tr>
-            <td style="padding:10px 10px;"><strong>Arjun Rao</strong><br><span style="color:var(--muted); font-size:11px;">+91 98765 43210</span></td>
-            <td style="padding:10px 10px;">Apr 27, 11:00 AM</td>
-            <td style="padding:10px 10px;">Document collection</td>
-            <td style="padding:10px 10px;"><span class="status-dot dot-pending"></span>Pending</td>
-            <td style="padding:10px 10px;"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;">Call</button></td>
-          </tr>
+        <tbody id="upcomingFollowupsBody">
+          <tr><td colspan="5" style="padding:16px;color:var(--muted);text-align:center;">Loading...</td></tr>
         </tbody>
       </table>
     </div>
@@ -705,13 +632,7 @@
     <div class="form-row full">
       <div class="form-group">
         <label>Select Lead</label>
-        <select>
-          <option>Neha Joshi — MCA</option>
-          <option>Sana Shaikh — MCA</option>
-          <option>Karan Malhotra — MBA</option>
-          <option>Divya Nair — BBA</option>
-          <option>Rohit Sen — BCA</option>
-        </select>
+        <select id="scheduleLeadSelect"></select>
       </div>
     </div>
     <div class="form-row">
@@ -775,11 +696,13 @@
 
       // Load today's schedule
       const followupList = document.querySelector('.followup-list');
-      if (followupList && followups.length > 0) {
+      if (followupList) {
         const todayItems = followups
           .filter(f => f.scheduledDate && f.scheduledDate.startsWith(today))
           .sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate));
-        followupList.innerHTML = todayItems.map(f => {
+        followupList.innerHTML = todayItems.length === 0
+          ? '<div style="color:var(--muted);font-size:13px;padding:8px;">No follow-ups scheduled for today.</div>'
+          : todayItems.map(f => {
           const d = new Date(f.scheduledDate);
           const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
           const lead = f.lead || {};
@@ -797,15 +720,17 @@
 
       // Load upcoming follow-ups table
       const tbody = document.querySelector('.lead-table tbody');
-      if (tbody && followups.length > 0) {
-        tbody.innerHTML = followups.map(f => {
+      if (tbody) {
+        tbody.innerHTML = followups.length === 0
+          ? '<tr><td colspan="5" style="padding:16px;color:var(--muted);text-align:center;">No follow-ups found.</td></tr>'
+          : followups.map(f => {
           const lead = f.lead || {};
           return `<tr>
             <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><strong>${lead.firstName || ''} ${lead.lastName || ''}</strong><br><span style="color:var(--muted); font-size:11px;">${lead.countryCode || '+91'} ${lead.phone || ''}</span></td>
             <td style="padding:10px 10px; border-bottom:1px solid var(--border);">${fmtDate(f.scheduledDate)}</td>
             <td style="padding:10px 10px; border-bottom:1px solid var(--border);">${f.notes || 'Follow-up'}</td>
             <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><span class="status-dot ${f.status === 'COMPLETED' ? 'dot-done' : f.scheduledDate < today ? 'dot-overdue' : 'dot-pending'}"></span>${f.status === 'COMPLETED' ? 'Completed' : f.scheduledDate < today ? 'Overdue' : 'Pending'}</td>
-            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="location.href='tel:${lead.phone || ''}'">Call</button></td>
+            <td style="padding:10px 10px; border-bottom:1px solid var(--border);"><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="initiateCall('${(lead.firstName||'')+' '+(lead.lastName||'')}', '${lead.phone || ''}')">Call</button></td>
           </tr>`;
         }).join('');
       }

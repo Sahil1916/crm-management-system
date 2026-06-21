@@ -677,7 +677,22 @@
   </div>
 </div>
 
-<script src="frontend-qa.js"></script>
+<script src="frontend-qa.js"></script>
+
+
+<script>
+function hydrateMonthLabels(selector) {
+  const labels = Array.from(document.querySelectorAll(selector));
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-IN', { month: 'short' });
+  labels.slice(0, 6).forEach((label, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
+    label.textContent = formatter.format(date);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => hydrateMonthLabels('.bar-lbl'));
+</script>
+
 </body>
 </html>
 

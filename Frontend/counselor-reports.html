@@ -535,28 +535,28 @@
         </thead>
         <tbody>
           <tr>
-            <td><strong>Week 1</strong><br><span style="color:var(--muted); font-size:11px;">Apr 1-7</span></td>
+            <td><strong>Week 1</strong><br><span style="color:var(--muted); font-size:11px;">Week range</span></td>
             <td>42</td>
             <td>18</td>
             <td>2</td>
             <td><span style="color:var(--accent2);">68%</span></td>
           </tr>
           <tr>
-            <td><strong>Week 2</strong><br><span style="color:var(--muted); font-size:11px;">Apr 8-14</span></td>
+            <td><strong>Week 2</strong><br><span style="color:var(--muted); font-size:11px;">Week range</span></td>
             <td>48</td>
             <td>22</td>
             <td>3</td>
             <td><span style="color:var(--accent2);">72%</span></td>
           </tr>
           <tr>
-            <td><strong>Week 3</strong><br><span style="color:var(--muted); font-size:11px;">Apr 15-21</span></td>
+            <td><strong>Week 3</strong><br><span style="color:var(--muted); font-size:11px;">Week range</span></td>
             <td>51</td>
             <td>25</td>
             <td>4</td>
             <td><span style="color:var(--accent2);">75%</span></td>
           </tr>
           <tr>
-            <td><strong>Week 4</strong><br><span style="color:var(--muted); font-size:11px;">Apr 22-28</span></td>
+            <td><strong>Week 4</strong><br><span style="color:var(--muted); font-size:11px;">Week range</span></td>
             <td>45</td>
             <td>29</td>
             <td>5</td>
@@ -569,7 +569,22 @@
   </div>
 </div>
 
-<script src="frontend-qa.js"></script>
+<script src="frontend-qa.js"></script>
+
+
+<script>
+function hydrateMonthLabels(selector) {
+  const labels = Array.from(document.querySelectorAll(selector));
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-IN', { month: 'short' });
+  labels.slice(0, 6).forEach((label, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
+    label.textContent = formatter.format(date);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => hydrateMonthLabels('.bar-label'));
+</script>
+
 </body>
 </html>
 

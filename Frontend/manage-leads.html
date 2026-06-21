@@ -721,10 +721,10 @@
       <div class="form-group">
         <label>Assign List / Tag</label>
         <select>
-          <option>Meta Campaign Apr25</option>
-          <option>Google Ads Apr25</option>
-          <option>Instagram Apr25</option>
-          <option>Walk-in Apr25</option>
+          <option>Meta Campaign</option>
+          <option>Google Ads</option>
+          <option>Instagram</option>
+          <option>Walk-in</option>
         </select>
       </div>
     </div>
@@ -765,7 +765,7 @@
             <td><span class="source-tag ${srcClass}">${srcLabel}</span></td>
             <td><span class="stage-pill ${stageClass}">${stageLabel}</span></td>
             <td>${l.assignedTo ? l.assignedTo.name : 'Unassigned'}</td>
-            <td>${new Date(l.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}</td>
+            <td>${formatDateTime(l.updatedAt || l.createdAt)}</td>
             <td><button class="btn btn-outline" style="font-size:11px; padding:4px 9px;" onclick="viewLead(${l.id})">View</button></td>
           </tr>`;
         }).join('');
@@ -884,6 +884,7 @@
     });
   }
 </script>
-<script src="frontend-qa.js"></script>
+<script src="frontend-qa.js"></script>
+
 </body>
 </html>
